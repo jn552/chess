@@ -52,6 +52,15 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+
+        if (type == PieceType.BISHOP){
+            int[][] bishop_vects = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};  // loop direct_vectors and add scalar multiples until blocked
+            for (int[] vect : bishop_vects){
+                int row_comp = vect[0];
+                int col_comp = vect[0];
+
+            }
+        }
+        return
     }
 }
