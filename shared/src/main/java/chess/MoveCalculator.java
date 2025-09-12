@@ -1,7 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public abstract class MoveCalculator {
     protected ChessBoard board;
@@ -11,40 +11,45 @@ public abstract class MoveCalculator {
     }
 
     // my abstract function for each subclass to implement
-    public abstract List<ChessPosition> get_moves(ChessPiece piece);
+    public abstract Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos);
+
+    // helper for checking out of bounds
+    public Boolean out_of_bounds(int x, int y){
+        return x < 1 || x > 8 || y < 1 || y > 8;
+    }
 
     // helper for sliding queens, rooks, bishops
-    public List<ChessPosition> slide_helper(ChessPiece piece, ChessPosition start_pos, int[][] direction_vects) {
-        List<ChessPosition> possible_moves = new ArrayList<>();
+    public Collection<ChessMove> slide_helper(ChessPiece piece, ChessPosition start_pos, int[][] direction_vects) {
+        Collection<ChessMove> possible_moves = new ArrayList<>();
 
         // loop through all direction vectors and append scalar multiples until obstacle
         for (int[] vect : direction_vects) {
-
             int x_comp = vect[0];
             int y_comp = vect[1];
             int scalar = 1;
 
             while (true) {
-
-                int x_tracker = start_pos.getRow() + scalar * x_comp - 1;  // tracking where we slide to
-                int y_tracker = start_pos.getColumn() + scalar * y_comp - 1;
-                ChessPosition potential_move = new ChessPosition(x_tracker, y_tracker);
+                int x_tracker = start_pos.getRow() + scalar * x_comp;  // tracking where we slide to
+                int y_tracker = start_pos.getColumn() + scalar * y_comp;
 
                 // break if blocked or out of bounds and move onto next vector direction
-                if (x_tracker > 7 || y_tracker > 7) {
+                if (out_of_bounds(x_tracker, y_tracker)) {
                     break;
                 }
 
-                if (board.getPiece(potential_move) == null) {
+                ChessPosition potential_pos = new ChessPosition(x_tracker, y_tracker);
+                ChessMove potential_move = new ChessMove(start_pos, potential_pos, null);
+
+                if (board.getPiece(potential_pos) == null) {
                     possible_moves.add(potential_move);
                 }
-
                 else {
-                    if (board.getPiece(potential_move).getTeamColor() != piece.getTeamColor()) {
+                    if (board.getPiece(potential_pos).getTeamColor() != piece.getTeamColor()) {
                         possible_moves.add(potential_move);
                     }
                     break;
                 }
+                scalar += 1;
 
             }
         }

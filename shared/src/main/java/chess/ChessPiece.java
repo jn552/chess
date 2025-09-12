@@ -56,12 +56,21 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
 
         // logic for bishops
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            ChessPosition[] bishop_directions = {new ChessPosition(1, 1), new ChessPosition(1, -1), new ChessPosition(-1, 1), new ChessPosition(-1, -1)};
-            for (ChessPosition direction : bishop_directions) {
+        if (piece.getPieceType() == PieceType.ROOK) {
+            MoveCalculatorRook rook_calc = new MoveCalculatorRook(board);
+            return rook_calc.get_moves(piece, myPosition);
+        }
 
-            }
-            return List.of(new ChessMove(new ChessPosition(5, 4), new ChessPosition(1, 8), null));
+        // Bishop logic
+        if (piece.getPieceType() == PieceType.BISHOP){
+            MoveCalculatorBishop bishop_calc = new MoveCalculatorBishop(board);
+            return bishop_calc.get_moves(piece, myPosition);
+        }
+
+        //QUeen logic
+        if (piece.getPieceType() == PieceType.QUEEN) {
+            MoveCalculatorQueen queen_calc = new MoveCalculatorQueen(board);
+            return queen_calc.get_moves(piece, myPosition);
         }
         return List.of();
     }
