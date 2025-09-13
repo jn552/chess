@@ -68,11 +68,18 @@ public class ChessPiece {
             return bishop_calc.get_moves(piece, myPosition);
         }
 
-        //QUeen logic
+        //Queen logic
         if (piece.getPieceType() == PieceType.QUEEN) {
             MoveCalculatorQueen queen_calc = new MoveCalculatorQueen(board);
             return queen_calc.get_moves(piece, myPosition);
         }
+
+        // King logic
+        if (piece.getPieceType() == PieceType.KING) {
+            MoveCalculatorKing king_calc = new MoveCalculatorKing(board);
+            return king_calc.get_moves(piece, myPosition);
+        }
+
         return List.of();
     }
 

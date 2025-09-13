@@ -18,6 +18,28 @@ public abstract class MoveCalculator {
         return x < 1 || x > 8 || y < 1 || y > 8;
     }
 
+    // helper for jumping pieces
+    public Collection<ChessMove> jump_helper(ChessPiece piece, ChessPosition start_pos, int[][] jumps) {
+        Collection<ChessMove> possible_moves = new ArrayList<>();
+
+        // loop through jump locations
+        for (int[] jump : jumps) {
+            int x_tracker = start_pos.getRow() + jump[0];
+            int y_tracker = start_pos.getColumn() + jump[1];
+            if (out_of_bounds(x_tracker, y_tracker)) continue;
+            ChessPosition potential_pos = new ChessPosition(x_tracker, y_tracker);
+            if (board.getPiece(potential_pos) == null) {
+                possible_moves.add(new ChessMove(start_pos, potential_pos, null));
+            }
+            else {
+                if (board.getPiece(potential_pos).getTeamColor() != piece.getTeamColor()) {
+                    possible_moves.add(new ChessMove(start_pos, potential_pos, null));
+                }
+            }
+        }
+        return possible_moves;
+    }
+
     // helper for sliding queens, rooks, bishops
     public Collection<ChessMove> slide_helper(ChessPiece piece, ChessPosition start_pos, int[][] direction_vects) {
         Collection<ChessMove> possible_moves = new ArrayList<>();
@@ -50,7 +72,6 @@ public abstract class MoveCalculator {
                     break;
                 }
                 scalar += 1;
-
             }
         }
         return possible_moves;
