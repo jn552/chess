@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -73,5 +74,21 @@ public class ChessPiece {
             return queen_calc.get_moves(piece, myPosition);
         }
         return List.of();
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return type == that.type &&
+                pieceColor == that.pieceColor;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        hash = 71 * hash + type.hashCode();
+        hash = 71 * hash + pieceColor.hashCode();
+        return hash;
     }
 }
