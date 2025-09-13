@@ -10,10 +10,21 @@ public class MoveCalclatorPawn extends MoveCalculator {
 
     @Override
     public Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos) {
-        int[][] jumps = {};
         Collection<ChessMove> potential_moves = new ArrayList<>();
         // Work flow
         // if first move, maybe check if its in start position, since pawns can't move backwards, they can only be at starting pos once
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if (start_pos.getRow() == 2) potential_moves.add(new ChessMove(start_pos, new ChessPosition(4, start_pos.getColumn()), null));
+
+            if (!out_of_bounds(start_pos.getRow() + 1, start_pos.getColumn()) &&
+                    board.getPiece(new ChessPosition(start_pos.getRow() + 1, start_pos.getColumn())) == null) {
+                potential_moves.add(new ChessMove(start_pos, new ChessPosition(start_pos.getRow() + 1, start_pos.getColumn()), null));
+            }
+
+        }
+        else {
+
+        }
         // check if there are ENEMIES on their diagonals if there are, add those possible moves
         // check if can move forward
 
