@@ -63,24 +63,34 @@ public class ChessPiece {
         }
 
         // Bishop logic
-        if (piece.getPieceType() == PieceType.BISHOP){
+        else if (piece.getPieceType() == PieceType.BISHOP){
             MoveCalculatorBishop bishop_calc = new MoveCalculatorBishop(board);
             return bishop_calc.get_moves(piece, myPosition);
         }
 
         //Queen logic
-        if (piece.getPieceType() == PieceType.QUEEN) {
+        else if (piece.getPieceType() == PieceType.QUEEN) {
             MoveCalculatorQueen queen_calc = new MoveCalculatorQueen(board);
             return queen_calc.get_moves(piece, myPosition);
         }
 
         // King logic
-        if (piece.getPieceType() == PieceType.KING) {
+        else if (piece.getPieceType() == PieceType.KING) {
             MoveCalculatorKing king_calc = new MoveCalculatorKing(board);
             return king_calc.get_moves(piece, myPosition);
         }
 
-        return List.of();
+        // Pawn logic
+        else if (piece.getPieceType() == PieceType.PAWN) {
+            MoveCalclatorPawn pawn_calc = new MoveCalclatorPawn(board);
+            return pawn_calc.get_moves(piece, myPosition);
+        }
+
+        // only piece left is knight so knight logic
+        else {
+            MoveCalculatorKnight knight_calc = new MoveCalculatorKnight(board);
+            return knight_calc.get_moves(piece, myPosition);
+        }
     }
 
     @Override public boolean equals(Object o) {
