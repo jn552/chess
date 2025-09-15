@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -11,7 +13,7 @@ public class ChessBoard {
     ChessPiece[][] squares = new ChessPiece[8][8];  //creates empty 8x8 board but index starts at 0, so 0-7
 
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -40,6 +42,38 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        // getting pawns in
+        for (int i = 0;  i <=7; i++) {
+            squares[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            squares[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        }
+
+        ChessGame.TeamColor[] colors = {ChessGame.TeamColor.BLACK, ChessGame.TeamColor.WHITE};
+        for (ChessGame.TeamColor color : colors) {
+            int row = (color == ChessGame.TeamColor.WHITE ? 0 : 7);
+            squares[row][0] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+            squares[row][1] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            squares[row][2] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+            squares[row][3] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+            squares[row][4] = new ChessPiece(color, ChessPiece.PieceType.KING);
+            squares[row][5] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+            squares[row][6] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            squares[row][7] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(this.squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 31;
+        hash = 71 * hash + Arrays.deepHashCode(squares);
+        return hash;
     }
 }
