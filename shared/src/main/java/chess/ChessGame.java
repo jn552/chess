@@ -10,6 +10,8 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    int num_moves = 0;
+
     public ChessGame() {
 
     }
@@ -18,7 +20,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return (num_moves % 2 == 0 ? TeamColor.WHITE : TeamColor.BLACK);  // if even then white, black otherwise
     }
 
     /**
@@ -56,7 +58,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        num_moves += 1;
     }
 
     /**
