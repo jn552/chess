@@ -11,6 +11,7 @@ import java.util.Collection;
 public class ChessGame {
 
     int num_moves = 0;
+    ChessBoard game_board;
 
     public ChessGame() {
 
@@ -48,7 +49,16 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = game_board.getPiece(startPosition);  // get piece
+        if (piece == null) return null;  // return null if no piece
+
+        // get raw moves
+        Collection<ChessMove> potential_moves = piece.pieceMoves(game_board, startPosition);
+
+        // remove invalid moves
+        // IMPLEMENT LOGIC HERE
+
+        return potential_moves;
     }
 
     /**
@@ -68,7 +78,34 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        // finding king by looping through board
+        ChessPosition king_pos = null;  // init
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = game_board.squares[i][j];
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    king_pos = new ChessPosition(i + 1, j + 1);
+                }
+            }
+        }
+
+        // checking all opponent's possible moves
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = game_board.squares[i][j];
+
+                if (piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> potential_moves = piece.pieceMoves(game_board, new ChessPosition(i + 1, j + 1));
+                    for (ChessMove move: potential_moves) {
+                        if (move.getEndPosition() == king_pos) return true;
+                    }
+
+                }
+            }
+        }
+
+        return false;  // return not in check if above return statement is never run
     }
 
     /**
@@ -98,7 +135,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        game_board = board;
     }
 
     /**
@@ -107,6 +144,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return game_board;
     }
 }
