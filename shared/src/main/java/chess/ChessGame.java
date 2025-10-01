@@ -69,6 +69,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         num_moves += 1;
+        // add the test files from the getting staetes
     }
 
     /**
