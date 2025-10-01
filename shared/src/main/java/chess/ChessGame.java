@@ -82,11 +82,13 @@ public class ChessGame {
 
         // finding king by looping through board
         ChessPosition king_pos = null;  // init
+        outerLoop:
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = game_board.squares[i][j];
                 if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                     king_pos = new ChessPosition(i + 1, j + 1);
+                    break outerLoop;
                 }
             }
         }
@@ -99,9 +101,8 @@ public class ChessGame {
                 if (piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> potential_moves = piece.pieceMoves(game_board, new ChessPosition(i + 1, j + 1));
                     for (ChessMove move: potential_moves) {
-                        if (move.getEndPosition() == king_pos) return true;
+                        if (move.getEndPosition().equals(king_pos)) return true;
                     }
-
                 }
             }
         }
@@ -117,6 +118,8 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+
+        // get all legal moves, make and copy a new chess board after executing the move; if still in check for all of them, you are in check mate
     }
 
     /**
@@ -128,6 +131,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        // if you are not in checkmate and you have no legal moves then you are in checkmate
     }
 
     /**
