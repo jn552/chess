@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -10,8 +11,8 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    int num_moves = 0;
     ChessBoard game_board;
+    TeamColor team_turn = TeamColor.WHITE;
 
     public ChessGame() {
 
@@ -21,7 +22,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return (num_moves % 2 == 0 ? TeamColor.WHITE : TeamColor.BLACK);  // if even then white, black otherwise
+        return team_turn;
     }
 
     /**
@@ -30,7 +31,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        team_turn = team;
     }
 
     /**
@@ -49,6 +50,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        // init new list to append valid moves to
+        Collection<ChessMove> valid_moves = new ArrayList<>();
         ChessPiece piece = game_board.getPiece(startPosition);  // get piece
         if (piece == null) return null;  // return null if no piece
 
@@ -56,9 +59,34 @@ public class ChessGame {
         Collection<ChessMove> potential_moves = piece.pieceMoves(game_board, startPosition);
 
         // remove invalid moves
-        // IMPLEMENT LOGIC HERE
+        for (ChessMove move : potential_moves) {
+            try {
+                is_valid(move, game_board);
+                valid_moves.add(move);
+            } catch (InvalidMoveException e) {
+                continue;
+            }
+        }
 
-        return potential_moves;
+        return valid_moves;
+    }
+
+    public void is_valid(ChessMove move, ChessBoard board) throws InvalidMoveException {
+        // makes temporary chess game and executes move
+        ChessBoard potential_board = game_board.clone();
+        ChessGame temp_game = new ChessGame();
+        temp_game.setBoard(potential_board);
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+
+
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(team_turn, move.getPromotionPiece());
+        }
+        temp_game.game_board.squares[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = piece;
+        temp_game.game_board.squares[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+
+        // throw exception if move leaves you in check
+        if (temp_game.isInCheck(team_turn)) throw new InvalidMoveException();
     }
 
     /**
@@ -68,8 +96,35 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        num_moves += 1;
-        // add the test files from the getting staetes
+        ChessPosition end_pos = move.getEndPosition();
+        ChessPosition start_pos = move.getStartPosition();
+        int start_row = start_pos.getRow();
+        int start_col = start_pos.getColumn();
+        ChessPiece piece = game_board.getPiece(start_pos);
+        int end_row = end_pos.getRow();
+        int end_col = end_pos.getColumn();
+        ChessPiece end_piece = game_board.getPiece(end_pos);
+
+        // if move has no piece on it
+        if (piece == null) throw new InvalidMoveException();
+
+        // if not your turn
+        if (piece.getTeamColor() != team_turn) throw new InvalidMoveException();
+
+        // if moving capture piece is on same team
+        if (end_piece != null && end_piece.getTeamColor() == team_turn) throw new InvalidMoveException();
+
+        // check to see if move leaves you in check, if it does kill the move
+        is_valid(move, game_board);
+
+        // by now, should be safe to make move on the real board
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(team_turn, move.getPromotionPiece());
+        }
+        game_board.squares[end_row - 1][end_col - 1] = piece;
+        game_board.squares[start_row - 1][start_col - 1] = null;
+        TeamColor next_turn_color = (team_turn == TeamColor.WHITE ? TeamColor.BLACK: TeamColor.WHITE);
+        setTeamTurn(next_turn_color);
     }
 
     /**
@@ -86,7 +141,7 @@ public class ChessGame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = game_board.squares[i][j];
-                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                     king_pos = new ChessPosition(i + 1, j + 1);
                     break outerLoop;
                 }
@@ -98,7 +153,7 @@ public class ChessGame {
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = game_board.squares[i][j];
 
-                if (piece.getTeamColor() != teamColor) {
+                if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> potential_moves = piece.pieceMoves(game_board, new ChessPosition(i + 1, j + 1));
                     for (ChessMove move: potential_moves) {
                         if (move.getEndPosition().equals(king_pos)) return true;
@@ -150,5 +205,22 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return game_board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame that = (ChessGame) o;
+        return game_board.equals(that.game_board) &&
+                team_turn == that.team_turn;
+    }
+
+    @Override
+    public int hashCode(){
+        int hash = 17;
+        hash = 71 * hash + game_board.hashCode();
+        hash = 71 * hash + team_turn.hashCode();
+        return hash;
     }
 }

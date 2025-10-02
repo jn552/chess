@@ -76,4 +76,22 @@ public class ChessBoard {
         hash = 71 * hash + Arrays.deepHashCode(squares);
         return hash;
     }
+
+    @Override
+    public ChessBoard clone() {
+        ChessBoard clone = new ChessBoard();
+        clone.squares = new ChessPiece[8][8];
+
+        //Making a deep copy
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (this.squares[i][j] != null) {
+                    ChessPiece piece = this.squares[i][j];
+                    clone.squares[i][j] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                }
+            }
+        }
+
+        return clone;
+    }
 }
