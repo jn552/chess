@@ -15,7 +15,8 @@ public class ChessGame {
     TeamColor team_turn = TeamColor.WHITE;
 
     public ChessGame() {
-
+        game_board = new ChessBoard();
+        game_board.resetBoard();
     }
 
     /**
@@ -60,24 +61,20 @@ public class ChessGame {
 
         // remove invalid moves
         for (ChessMove move : potential_moves) {
-            try {
-                is_valid(move, game_board);
+            if (is_valid(move, game_board)) {
                 valid_moves.add(move);
-            } catch (InvalidMoveException e) {
-                continue;
             }
         }
 
         return valid_moves;
     }
 
-    public void is_valid(ChessMove move, ChessBoard board) throws InvalidMoveException {
+    public boolean is_valid(ChessMove move, ChessBoard board) {
         // makes temporary chess game and executes move
         ChessBoard potential_board = game_board.clone();
         ChessGame temp_game = new ChessGame();
         temp_game.setBoard(potential_board);
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-
+        ChessPiece piece = temp_game.game_board.getPiece(move.getStartPosition());
 
         if (move.getPromotionPiece() != null) {
             piece = new ChessPiece(team_turn, move.getPromotionPiece());
@@ -86,7 +83,7 @@ public class ChessGame {
         temp_game.game_board.squares[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
 
         // throw exception if move leaves you in check
-        if (temp_game.isInCheck(team_turn)) throw new InvalidMoveException();
+        return !temp_game.isInCheck(piece.getTeamColor());
     }
 
     /**
@@ -111,11 +108,12 @@ public class ChessGame {
         // if not your turn
         if (piece.getTeamColor() != team_turn) throw new InvalidMoveException();
 
-        // if moving capture piece is on same team
-        if (end_piece != null && end_piece.getTeamColor() == team_turn) throw new InvalidMoveException();
+        // if not a valid move for the specific piece it is
+        Collection<ChessMove> valid_moves = piece.pieceMoves(game_board, start_pos);
+        if (!valid_moves.contains(move)) throw new InvalidMoveException();
 
         // check to see if move leaves you in check, if it does kill the move
-        is_valid(move, game_board);
+        if (!is_valid(move, game_board)) throw new InvalidMoveException();
 
         // by now, should be safe to make move on the real board
         if (move.getPromotionPiece() != null) {
@@ -172,9 +170,21 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
 
-        // get all legal moves, make and copy a new chess board after executing the move; if still in check for all of them, you are in check mate
+        // checking to see if in check to begin with
+        if (!isInCheck(teamColor)) return false;
+
+        // checking to see if there are any valid moves left
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = game_board.squares[i][j];
+                if (piece == null || piece.getTeamColor() != teamColor) continue;
+                Collection<ChessMove> valid_moves = validMoves(new ChessPosition(i + 1, j + 1));
+                if (!valid_moves.isEmpty()) return false;
+            }
+        }
+        // if all teamColor pieces possible moves results in still being in check, then in checkmate and return true
+        return true;
     }
 
     /**
@@ -185,8 +195,23 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        // if you are not in checkmate and you have no legal moves then you are in checkmate
+
+        // if you are not in checkmate, and you have no legal moves then you are in checkmate
+
+        // checking to see if you are in check, if you are then not in stalemate
+        if (isInCheck(teamColor)) return false;
+
+        // checking to see if there are any valid moves left
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = game_board.squares[i][j];
+                if (piece == null || piece.getTeamColor() != teamColor) continue;
+                Collection<ChessMove> valid_moves = validMoves(new ChessPosition(i + 1, j + 1));
+                if (!valid_moves.isEmpty()) return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -219,8 +244,9 @@ public class ChessGame {
     @Override
     public int hashCode(){
         int hash = 17;
-        hash = 71 * hash + game_board.hashCode();
+        hash = 71 * hash + (game_board == null ? 0: game_board.hashCode());
         hash = 71 * hash + team_turn.hashCode();
         return hash;
     }
 }
+
