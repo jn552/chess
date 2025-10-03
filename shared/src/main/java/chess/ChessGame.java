@@ -57,10 +57,10 @@ public class ChessGame {
         if (piece == null) {return null;}  // return null if no piece
 
         // get raw moves
-        Collection<ChessMove> potential_moves = piece.pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> potentialMoves = piece.pieceMoves(gameBoard, startPosition);
 
         // remove invalid moves
-        for (ChessMove move : potential_moves) {
+        for (ChessMove move : potentialMoves) {
             if (isValid(move, gameBoard)) {
                 validMoves.add(move);
             }
@@ -126,6 +126,21 @@ public class ChessGame {
         setTeamTurn(nextTurnColor);
     }
 
+    public boolean inThreat(ChessPosition kingPos, TeamColor teamColor) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = gameBoard.squares[i][j];
+
+                if (piece == null || piece.getTeamColor() == teamColor) { continue;}
+                Collection<ChessMove> potentialMoves = piece.pieceMoves(gameBoard, new ChessPosition(i + 1, j + 1));
+                for (ChessMove move: potentialMoves) {
+                    if (move.getEndPosition().equals(kingPos)) {return true;}
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -147,21 +162,8 @@ public class ChessGame {
             }
         }
 
-        // checking all opponent's possible moves
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = gameBoard.squares[i][j];
-
-                if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> potentialMoves = piece.pieceMoves(gameBoard, new ChessPosition(i + 1, j + 1));
-                    for (ChessMove move: potentialMoves) {
-                        if (move.getEndPosition().equals(kingPos)) {return true;}
-                    }
-                }
-            }
-        }
-
-        return false;  // return not in check if above return statement is never run
+        // checking all opponent's possible moves to see if they threaten king
+        return inThreat(kingPos, teamColor);
     }
 
     public boolean validMovesLeft(TeamColor teamColor) {
