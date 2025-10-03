@@ -26,7 +26,7 @@ public abstract class MoveCalculator {
         for (int[] jump : jumps) {
             int xTracker = startPos.getRow() + jump[0];
             int yTracker = startPos.getColumn() + jump[1];
-            if (outOfBounds(xTracker, yTracker)) continue;
+            if (outOfBounds(xTracker, yTracker)) {continue;}
             ChessPosition potentialPos = new ChessPosition(xTracker, yTracker);
             if (board.getPiece(potentialPos) == null) {
                 possibleMoves.add(new ChessMove(startPos, potentialPos, null));
