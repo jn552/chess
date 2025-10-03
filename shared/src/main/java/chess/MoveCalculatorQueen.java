@@ -8,9 +8,9 @@ public class MoveCalculatorQueen extends MoveCalculator {
     }
 
     @Override
-    public Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos){
-        int[][] queen_directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-        return slide_helper(piece, start_pos, queen_directions);
+    public Collection<ChessMove> getMoves(ChessPiece piece, ChessPosition startPos){
+        int[][] queenDirections = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        return slideHelper(piece, startPos, queenDirections);
     }
 
 }

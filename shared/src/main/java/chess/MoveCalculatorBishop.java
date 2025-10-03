@@ -8,8 +8,8 @@ public class MoveCalculatorBishop extends MoveCalculator {
     }
 
     @Override
-    public Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos){
-        int[][] bishop_directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-        return slide_helper(piece, start_pos, bishop_directions);
+    public Collection<ChessMove> getMoves(ChessPiece piece, ChessPosition startPos){
+        int[][] bishopDirections = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        return slideHelper(piece, startPos, bishopDirections);
     }
 }

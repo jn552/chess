@@ -8,8 +8,8 @@ public class MoveCalculatorKing extends MoveCalculator {
     }
 
     @Override
-    public Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos) {
+    public Collection<ChessMove> getMoves(ChessPiece piece, ChessPosition startPos) {
         int[][] jumps = {{0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
-        return jump_helper(piece, start_pos, jumps);
+        return jumpHelper(piece, startPos, jumps);
     }
 }

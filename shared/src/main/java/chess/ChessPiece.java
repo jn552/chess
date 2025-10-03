@@ -1,8 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -14,6 +12,7 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    public boolean moved = false;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -58,38 +57,38 @@ public class ChessPiece {
 
         // logic for bishops
         if (piece.getPieceType() == PieceType.ROOK) {
-            MoveCalculatorRook rook_calc = new MoveCalculatorRook(board);
-            return rook_calc.get_moves(piece, myPosition);
+            MoveCalculatorRook rookCalc = new MoveCalculatorRook(board);
+            return rookCalc.getMoves(piece, myPosition);
         }
 
         // Bishop logic
         else if (piece.getPieceType() == PieceType.BISHOP){
-            MoveCalculatorBishop bishop_calc = new MoveCalculatorBishop(board);
-            return bishop_calc.get_moves(piece, myPosition);
+            MoveCalculatorBishop bishopCalc = new MoveCalculatorBishop(board);
+            return bishopCalc.getMoves(piece, myPosition);
         }
 
         //Queen logic
         else if (piece.getPieceType() == PieceType.QUEEN) {
-            MoveCalculatorQueen queen_calc = new MoveCalculatorQueen(board);
-            return queen_calc.get_moves(piece, myPosition);
+            MoveCalculatorQueen queenCalc = new MoveCalculatorQueen(board);
+            return queenCalc.getMoves(piece, myPosition);
         }
 
         // King logic
         else if (piece.getPieceType() == PieceType.KING) {
-            MoveCalculatorKing king_calc = new MoveCalculatorKing(board);
-            return king_calc.get_moves(piece, myPosition);
+            MoveCalculatorKing kingCalc = new MoveCalculatorKing(board);
+            return kingCalc.getMoves(piece, myPosition);
         }
 
         // Pawn logic
         else if (piece.getPieceType() == PieceType.PAWN) {
-            MoveCalclatorPawn pawn_calc = new MoveCalclatorPawn(board);
-            return pawn_calc.get_moves(piece, myPosition);
+            MoveCalculatorPawn pawnCalc = new MoveCalculatorPawn(board);
+            return pawnCalc.getMoves(piece, myPosition);
         }
 
         // only piece left is knight so knight logic
         else {
-            MoveCalculatorKnight knight_calc = new MoveCalculatorKnight(board);
-            return knight_calc.get_moves(piece, myPosition);
+            MoveCalculatorKnight knightCalc = new MoveCalculatorKnight(board);
+            return knightCalc.getMoves(piece, myPosition);
         }
     }
 

@@ -7,8 +7,8 @@ public class MoveCalculatorRook extends MoveCalculator {
         super(board);
     }
     @Override
-    public Collection<ChessMove> get_moves(ChessPiece piece, ChessPosition start_pos){
-        int[][] rook_directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        return slide_helper(piece, start_pos, rook_directions);
+    public Collection<ChessMove> getMoves(ChessPiece piece, ChessPosition startPos){
+        int[][] rookDirections = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        return slideHelper(piece, startPos, rookDirections);
     }
 }
