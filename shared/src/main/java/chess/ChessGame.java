@@ -135,13 +135,13 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
 
         // finding king by looping through board
-        ChessPosition king_pos = null;  // init
+        ChessPosition kingPos = null;  // init
         outerLoop:
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = gameBoard.squares[i][j];
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                    king_pos = new ChessPosition(i + 1, j + 1);
+                    kingPos = new ChessPosition(i + 1, j + 1);
                     break outerLoop;
                 }
             }
@@ -153,9 +153,9 @@ public class ChessGame {
                 ChessPiece piece = gameBoard.squares[i][j];
 
                 if (piece != null && piece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> potential_moves = piece.pieceMoves(gameBoard, new ChessPosition(i + 1, j + 1));
-                    for (ChessMove move: potential_moves) {
-                        if (move.getEndPosition().equals(king_pos)) return true;
+                    Collection<ChessMove> potentialMoves = piece.pieceMoves(gameBoard, new ChessPosition(i + 1, j + 1));
+                    for (ChessMove move: potentialMoves) {
+                        if (move.getEndPosition().equals(kingPos)) return true;
                     }
                 }
             }
@@ -164,6 +164,17 @@ public class ChessGame {
         return false;  // return not in check if above return statement is never run
     }
 
+    public boolean validMovesLeft(TeamColor teamColor) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = gameBoard.squares[i][j];
+                if (piece == null || piece.getTeamColor() != teamColor) continue;
+                Collection<ChessMove> validMoves = validMoves(new ChessPosition(i + 1, j + 1));
+                if (!validMoves.isEmpty()) return false;
+            }
+        }
+        return true;
+    }
     /**
      * Determines if the given team is in checkmate
      *
@@ -176,16 +187,8 @@ public class ChessGame {
         if (!isInCheck(teamColor)) return false;
 
         // checking to see if there are any valid moves left
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = gameBoard.squares[i][j];
-                if (piece == null || piece.getTeamColor() != teamColor) continue;
-                Collection<ChessMove> validMoves = validMoves(new ChessPosition(i + 1, j + 1));
-                if (!validMoves.isEmpty()) return false;
-            }
-        }
-        // if all teamColor pieces possible moves results in still being in check, then in checkmate and return true
-        return true;
+        return validMovesLeft(teamColor);
+
     }
 
     /**
@@ -203,16 +206,7 @@ public class ChessGame {
         if (isInCheck(teamColor)) return false;
 
         // checking to see if there are any valid moves left
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = gameBoard.squares[i][j];
-                if (piece == null || piece.getTeamColor() != teamColor) continue;
-                Collection<ChessMove> validMoves = validMoves(new ChessPosition(i + 1, j + 1));
-                if (!validMoves.isEmpty()) return false;
-            }
-        }
-
-        return true;
+        return validMovesLeft(teamColor);
     }
 
     /**
