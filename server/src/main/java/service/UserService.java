@@ -3,6 +3,8 @@ package service;
 import dataaccess.UserDAO;
 import model.UserData;
 
+import java.util.UUID;
+
 public class UserService {
     private final UserDAO userDao = new UserDAO();
 
@@ -21,6 +23,10 @@ public class UserService {
 
     public UserData getUserData(String username){
         return userDao.find(username);
+    }
+
+    public static String makeAuthToken(){
+        return UUID.randomUUID().toString();
     }
 
 

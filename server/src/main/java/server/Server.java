@@ -20,4 +20,12 @@ public class Server {
     public void stop() {
         javalin.stop();
     }
+
+    //public void createHandlers(Javalin javalin){
+        //javalin.get("/hello", new HelloBYUHandler()); // example from leture video, implememt that Handler as lambda , method or class (here it is a class)
+        // javalin has post, delete, put (https methods) so not all endpoints wil use get
+
+        //handler example class in javalin overview 18:19 (non json handler) and 20:05 (json handler)
+        // 22:01 for more complicated example
+    //}
 }
