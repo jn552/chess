@@ -16,19 +16,20 @@ public class ClearService {
     }
 
     public void clearAuth() {
-
+        authDao.clear();
     }
 
     public void clearGame(){
-
+        gameDao.clear();
     }
 
     public void clearUser(){
-
+        userDao.clear();
     }
 
     public void clearAll(){
-
+        clearAuth();
+        clearGame();
+        clearUser();
     }
-
 }

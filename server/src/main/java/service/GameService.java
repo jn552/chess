@@ -12,4 +12,7 @@ public class GameService {
         this.gameDao = gameDao;
         this.authDao = authDao;
     }
+
+    //TODO
+    // go to sequence digagram and immplement all the methods
 }

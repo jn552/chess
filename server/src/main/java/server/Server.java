@@ -20,16 +20,20 @@ public class Server {
 
         // making services (pass in daos into them)
         UserService userService = new UserService(userDao, authDao);
-        GameService gameService = new GameService(gameDao, authDao);  //TODO pass in gameDao and authDao
+        GameService gameService = new GameService(gameDao, authDao);
         ClearService clearService = new ClearService(userDao, authDao, gameDao);
-        // TODO make clear service
-
-
 
         // instantiate handlers (pass in services)
         RegisterHandler registerHandler = new RegisterHandler(userService);
 
-
+        //TODO
+        // LoginHandler
+        // LogoutHandler
+        // JoinGameHandler
+        // FindGameHandler
+        // ClearHandler
+        // CreateGameHandler
+        // clear service done, just implement game service and add unit tests and finish the handlers and should be good
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
