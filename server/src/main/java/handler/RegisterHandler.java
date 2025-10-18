@@ -9,8 +9,11 @@ import model.UserData;
 import service.UserService;
 
 public class RegisterHandler implements Handler {
-    private final UserService userService = new UserService();
+    private final UserService userService;
 
+    public RegisterHandler(UserService userService){
+        this.userService = userService;
+    }
     public void handle(Context context) {
         try {
             UserData user = context.bodyAsClass(UserData.class);
@@ -25,7 +28,7 @@ public class RegisterHandler implements Handler {
         catch (BadRequestException error) {
             context.status(400);
             // return message?
-
+            // context.json() or context.result() put  new Gson.tojson(Map.of("message", ex.getMessage") there is example n phase 3 github
         }
 
         catch (UsernameTakenException error){

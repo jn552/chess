@@ -1,7 +1,9 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
+import dataaccess.AuthDAOInterface;
+import dataaccess.AuthDAOMemory;
+import dataaccess.UserDAOInterface;
+import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
 import exception.UsernameTakenException;
 import model.AuthData;
@@ -10,8 +12,14 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    private final UserDAO userDao = new UserDAO();
-    private final AuthDAO authDao = new AuthDAO();
+
+    private final UserDAOInterface userDao;
+    private final AuthDAOInterface authDao;
+
+    public UserService(UserDAOInterface userDao, AuthDAOInterface authDao){
+        this.userDao = userDao;
+        this.authDao = authDao;
+    }
 
     public AuthData registerUser(UserData user) throws BadRequestException {
 

@@ -1,17 +1,43 @@
 package server;
 
+import dataaccess.*;
 import handler.RegisterHandler;
 import io.javalin.*;
+import service.GameService;
+import service.UserService;
 
 public class Server {
 
     private final Javalin javalin;
+    private final AuthDAOInterface authDao;
+    private final UserDAOInterface userDao;
+    private final GameDAOInterface gameDao;
+
 
     public Server() {
+
+        // instantiate DAOs
+        this.userDao = new UserDAOMemory();
+        this.authDao = new AuthDAOMemory();
+        this.gameDao = new GameDAOMemory();
+
+        // making services (pass in daos into them)
+        UserService userService = new UserService(userDao, authDao);
+        GameService gameService = new GameService();  //TODO pass in gameDao and authDao
+        // TODO make clear service
+
+
+
+        // instantiate handlers (pass in services)
+        RegisterHandler registerHandler = new RegisterHandler(userService);
+
+
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        javalin.post("/user", new RegisterHandler());
+        javalin.post("/user", registerHandler);
+        //ctx -> instanceofhandler  so replace this here with the instance o fhandler, look at handler slides for exampel
     }
 
     public int run(int desiredPort) {
@@ -22,12 +48,4 @@ public class Server {
     public void stop() {
         javalin.stop();
     }
-
-    //public void createHandlers(Javalin javalin){
-        //javalin.get("/hello", new HelloBYUHandler()); // example from leture video, implememt that Handler as lambda , method or class (here it is a class)
-        // javalin has post, delete, put (https methods) so not all endpoints wil use get
-
-        //handler example class in javalin overview 18:19 (non json handler) and 20:05 (json handler)
-        // 22:01 for more complicated example
-    //}
 }
