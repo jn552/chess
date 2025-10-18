@@ -9,17 +9,13 @@ import service.UserService;
 public class Server {
 
     private final Javalin javalin;
-    private final AuthDAOInterface authDao;
-    private final UserDAOInterface userDao;
-    private final GameDAOInterface gameDao;
-
 
     public Server() {
 
         // instantiate DAOs
-        this.userDao = new UserDAOMemory();
-        this.authDao = new AuthDAOMemory();
-        this.gameDao = new GameDAOMemory();
+        UserDAOInterface userDao = new UserDAOMemory();
+        AuthDAOInterface authDao = new AuthDAOMemory();
+        GameDAOInterface gameDao = new GameDAOMemory();
 
         // making services (pass in daos into them)
         UserService userService = new UserService(userDao, authDao);
@@ -37,7 +33,6 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", registerHandler);
-        //ctx -> instanceofhandler  so replace this here with the instance o fhandler, look at handler slides for exampel
     }
 
     public int run(int desiredPort) {
