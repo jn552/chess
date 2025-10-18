@@ -27,14 +27,12 @@ public class RegisterHandler implements Handler {
         catch (BadRequestException error) {
             context.status(400);
             context.json(Map.of("message", error.getMessage()));
-
             // context.json() or context.result() put  new Gson.tojson(Map.of("message", ex.getMessage") there is example n phase 3 github
         }
 
         catch (UsernameTakenException error){
             context.status(403);
             context.json(Map.of("message", error.getMessage()));
-            //return message?
         }
 
     }

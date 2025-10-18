@@ -6,7 +6,8 @@ import java.util.Collection;
 
 public interface GameDAOInterface {
 
+    GameData find(Integer gameID);
     void save(GameData gameData);
-    GameData find(String gameID);
     Collection<GameData> findAllGames();
+    void clear();
 }

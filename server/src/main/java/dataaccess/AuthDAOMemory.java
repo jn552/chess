@@ -2,18 +2,25 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AuthDAOMemory implements AuthDAOInterface{
+
+    private final Map<String, AuthData> authHash = new HashMap<>();
 
     @ Override
     public AuthData find(String authToken){
-        //TODO
-        // find the ret of auth data from the auth token
-        return null;  //return null means not authorized
+        return authHash.get(authToken);  //return null means not authorized
     }
 
     @ Override
     public void save(AuthData authData){
-        //TODO
-        // save auth data for a single person in record class (Authdata) to the db?
+        authHash.put(authData.username(), authData);
+    }
+
+    @ Override
+    public void clear(){
+        authHash.clear();
     }
 }

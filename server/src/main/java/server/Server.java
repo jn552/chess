@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import handler.RegisterHandler;
 import io.javalin.*;
+import service.ClearService;
 import service.GameService;
 import service.UserService;
 
@@ -19,7 +20,8 @@ public class Server {
 
         // making services (pass in daos into them)
         UserService userService = new UserService(userDao, authDao);
-        GameService gameService = new GameService();  //TODO pass in gameDao and authDao
+        GameService gameService = new GameService(gameDao, authDao);  //TODO pass in gameDao and authDao
+        ClearService clearService = new ClearService(userDao, authDao, gameDao);
         // TODO make clear service
 
 

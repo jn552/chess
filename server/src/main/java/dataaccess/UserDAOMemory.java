@@ -1,19 +1,25 @@
 package dataaccess;
 import model.UserData;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserDAOMemory implements UserDAOInterface {
+
+    private final Map<String, UserData> userHash = new HashMap<>();
 
     @ Override
     public UserData find(String username){
-        //TODO
-        // find the ret of user data from the username
-        return null;  //return null means user DNE
+        return userHash.get(username);  //return null means user DNE
     }
 
     @ Override
     public void save(UserData userData){
-        //TODO
-        // save a single users data stored in record class (UserData) to the db?
+        userHash.put(userData.username(), userData);
     }
 
+    @ Override
+    public void clear(){
+        userHash.clear();
+    }
 }
