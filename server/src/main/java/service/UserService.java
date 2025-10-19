@@ -5,8 +5,10 @@ import dataaccess.AuthDAOMemory;
 import dataaccess.UserDAOInterface;
 import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
+import exception.NotAuthException;
 import exception.UsernameTakenException;
 import model.AuthData;
+import model.LoginData;
 import model.UserData;
 
 import java.util.UUID;
@@ -49,5 +51,38 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
+    public void isUser(String username) throws BadRequestException {
+        if (username == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+        if (userDao.find(username) == null){
+            throw new NotAuthException("Error: unauthorized");
+        }
+    }
 
+    public AuthData validatePassword(LoginData loginData) throws BadRequestException {
+
+        // unpack info
+        String username = loginData.username();
+        String password = loginData.password();
+
+        // check if any of LoginData fields are null
+        if (username == null || password == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+
+        // get real password
+        String real_pass = userDao.find(username).password();
+
+        // check if passwords match
+        if (!password.equals(real_pass)) {
+            throw new NotAuthException("Error: unauthorized");
+        }
+
+        // make new authData and save it
+        AuthData authData = new AuthData(username, makeAuthToken());
+        authDao.save(authData);
+
+        return authData;
+    }
 }

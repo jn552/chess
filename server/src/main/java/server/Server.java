@@ -1,7 +1,7 @@
 package server;
 
 import dataaccess.*;
-import handler.RegisterHandler;
+import handler.*;
 import io.javalin.*;
 import service.ClearService;
 import service.GameService;
@@ -26,19 +26,28 @@ public class Server {
         // instantiate handlers (pass in services)
         RegisterHandler registerHandler = new RegisterHandler(userService);
 
-        //TODO
-        // LoginHandler
-        // LogoutHandler
-        // JoinGameHandler
-        // FindGameHandler
-        // ClearHandler
-        // CreateGameHandler
-        // clear service done, just implement game service and add unit tests and finish the handlers and should be good
+        //TODO: add logic to services
+        LoginHandler loginHandler = new LoginHandler(userService);
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
+        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+        ListGameHandler listGameHandler = new ListGameHandler(gameService);
+        ClearHandler clearHandler = new ClearHandler(clearService);
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+        //TODO: add unit tests and finish the handlers and should be good
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", registerHandler);
+        javalin.delete("/db", clearHandler);
+        javalin.post("/session", loginHandler);
+        javalin.delete("/session", logoutHandler);
+        javalin.get("/game", listGameHandler);
+        javalin.post("/game", createGameHandler);
+        javalin.put("/game", joinGameHandler);
+
+
+
     }
 
     public int run(int desiredPort) {
