@@ -23,4 +23,9 @@ public class AuthDAOMemory implements AuthDAOInterface{
     public void clear(){
         authHash.clear();
     }
+
+    @ Override
+    public void remove(String authToken){
+        authHash.remove(authToken);
+    }
 }

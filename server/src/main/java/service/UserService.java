@@ -85,4 +85,24 @@ public class UserService {
 
         return authData;
     }
+
+    public void validateAuth(String authToken) throws BadRequestException {
+
+        // check if authToken is null
+        if (authToken == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+
+        AuthData authData = authDao.find(authToken);
+
+        // check if data returned is null, ie unauthorized
+        if (authData == null) {
+            throw new NotAuthException("Error: unauthorized");
+        }
+
+    }
+
+    public void removeAuth(String authToken){
+        authDao.remove(authToken);
+    }
 }
