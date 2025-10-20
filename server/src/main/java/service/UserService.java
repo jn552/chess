@@ -36,7 +36,7 @@ public class UserService {
 
         // if no errors then make auth token and save info
         String authToken = makeAuthToken();
-        AuthData authData = new AuthData(authToken, user.username());
+        AuthData authData = new AuthData(user.username(), authToken);
         userDao.save(user);
         authDao.save(authData);
 
@@ -93,10 +93,8 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
 
-        AuthData authData = authDao.find(authToken);
-
         // check if data returned is null, ie unauthorized
-        if (authData == null) {
+        if (authDao.find(authToken) == null) {
             throw new NotAuthException("Error: unauthorized");
         }
 

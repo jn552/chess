@@ -16,7 +16,7 @@ public class AuthDAOMemory implements AuthDAOInterface{
 
     @ Override
     public void save(AuthData authData){
-        authHash.put(authData.username(), authData);
+        authHash.put(authData.authToken(), authData);
     }
 
     @ Override

@@ -43,7 +43,6 @@ public class LogoutHandler implements Handler {
             context.status(401);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
         }
-
     }
 
 }

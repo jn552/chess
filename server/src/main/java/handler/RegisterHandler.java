@@ -26,13 +26,12 @@ public class RegisterHandler implements Handler {
             UserData user = gson.fromJson(json, UserData.class);
             AuthData authData = userService.registerUser(user);
             context.status(200);
-            context.result(gson.toJson(authData));
+            context.result(gson.toJson(Map.of("username", authData.username(), "authToken", authData.authToken())));
         }
 
         catch (BadRequestException error) {
             context.status(400);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
-            // context.json() or context.result() put  new Gson.tojson(Map.of("message", ex.getMessage") there is example n phase 3 github
         }
 
         catch (UsernameTakenException error){
