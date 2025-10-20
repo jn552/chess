@@ -10,8 +10,6 @@ import model.CreateGameData;
 import model.GameData;
 import model.JoinRequestData;
 
-import java.text.CollationElementIterator;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class GameService {
@@ -24,7 +22,7 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    public void validateAuth(String authToken) {
+    private void validateAuth(String authToken) {
         if (authToken == null) {
             throw new NotAuthException("Error: unauthorized");
         }
@@ -33,7 +31,7 @@ public class GameService {
         }
     }
 
-    public void saveGame(GameData gameData) {
+    private void saveGame(GameData gameData) {
         gameDao.save(gameData);
     }
 
@@ -58,7 +56,7 @@ public class GameService {
         return gameID;
     }
 
-    public void ableToJoin(ChessGame.TeamColor teamColor, GameData gameData) {
+    private void ableToJoin(ChessGame.TeamColor teamColor, GameData gameData) {
         if (teamColor == ChessGame.TeamColor.BLACK) {
             if (gameData.blackUsername() != null){
                 throw new TakenException("Error: already taken");
@@ -108,7 +106,6 @@ public class GameService {
     public Collection<GameData> listGames(String authToken){
         //validate auth
         validateAuth(authToken);
-
         return gameDao.findAllGames();
     }
 

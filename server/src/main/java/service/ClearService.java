@@ -15,15 +15,15 @@ public class ClearService {
         this.gameDao = gameDao;
     }
 
-    public void clearAuth() {
+    private void clearAuth() {
         authDao.clear();
     }
 
-    public void clearGame(){
+    private void clearGame(){
         gameDao.clear();
     }
 
-    public void clearUser(){
+    private void clearUser(){
         userDao.clear();
     }
 

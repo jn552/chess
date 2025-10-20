@@ -41,11 +41,7 @@ public class UserService {
         return authData;
     }
 
-    public UserData getUserData(String username){
-        return userDao.find(username);
-    }
-
-    public static String makeAuthToken(){
+    private static String makeAuthToken(){
         return UUID.randomUUID().toString();
     }
 
@@ -95,7 +91,6 @@ public class UserService {
         if (authDao.find(authToken) == null) {
             throw new NotAuthException("Error: unauthorized");
         }
-
     }
 
     public void removeAuth(String authToken){
