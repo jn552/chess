@@ -10,6 +10,10 @@ import model.CreateGameData;
 import model.GameData;
 import model.JoinRequestData;
 
+import java.text.CollationElementIterator;
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class GameService {
     private final GameDAOInterface gameDao;
     private final AuthDAOInterface authDao;
@@ -99,6 +103,13 @@ public class GameService {
             newGameData = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
         }
         gameDao.save(newGameData);
+    }
+
+    public Collection<GameData> listGames(String authToken){
+        //validate auth
+        validateAuth(authToken);
+
+        return gameDao.findAllGames();
     }
 
 }
