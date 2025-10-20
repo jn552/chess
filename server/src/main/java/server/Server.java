@@ -18,7 +18,7 @@ public class Server {
         AuthDAOInterface authDao = new AuthDAOMemory();
         GameDAOInterface gameDao = new GameDAOMemory();
 
-        // making services (pass in daos into them)
+        // making services (pass in DAOs into them)
         UserService userService = new UserService(userDao, authDao);
         GameService gameService = new GameService(gameDao, authDao);
         ClearService clearService = new ClearService(userDao, authDao, gameDao);
@@ -26,14 +26,12 @@ public class Server {
         // instantiate handlers (pass in services)
         RegisterHandler registerHandler = new RegisterHandler(userService);
 
-        //TODO: add logic to services
         LoginHandler loginHandler = new LoginHandler(userService);
         LogoutHandler logoutHandler = new LogoutHandler(userService);
         JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
         ListGameHandler listGameHandler = new ListGameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
-        //TODO: add unit tests and finish the handlers and should be good
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
