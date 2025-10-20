@@ -30,4 +30,9 @@ public class GameDAOMemory implements GameDAOInterface{
     public void clear(){
         gameHash.clear();
     }
+
+    @ Override
+    public void remove(GameData gameData){
+        gameHash.remove(gameData.gameID());
+    }
 }

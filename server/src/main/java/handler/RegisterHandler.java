@@ -2,7 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import exception.BadRequestException;
-import exception.UsernameTakenException;
+import exception.TakenException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 
@@ -34,7 +34,7 @@ public class RegisterHandler implements Handler {
             context.result(gson.toJson(Map.of("message", error.getMessage())));
         }
 
-        catch (UsernameTakenException error){
+        catch (TakenException error){
             context.status(403);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
         }

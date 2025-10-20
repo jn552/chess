@@ -1,12 +1,10 @@
 package service;
 
 import dataaccess.AuthDAOInterface;
-import dataaccess.AuthDAOMemory;
 import dataaccess.UserDAOInterface;
-import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
 import exception.NotAuthException;
-import exception.UsernameTakenException;
+import exception.TakenException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
@@ -31,7 +29,7 @@ public class UserService {
         }
         // check if username is taken
         if (userDao.find(user.username()) != null) {
-            throw new UsernameTakenException("Error: already taken");
+            throw new TakenException("Error: already taken");
         }
 
         // if no errors then make auth token and save info

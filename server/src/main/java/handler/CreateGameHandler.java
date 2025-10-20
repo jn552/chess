@@ -3,12 +3,9 @@ package handler;
 import com.google.gson.Gson;
 import exception.BadRequestException;
 import exception.NotAuthException;
-import exception.UsernameTakenException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import model.AuthData;
 import model.CreateGameData;
-import model.UserData;
 import service.GameService;
 
 import java.util.Map;
@@ -22,11 +19,12 @@ public class CreateGameHandler implements Handler {
     }
     public void handle(Context context) {
         try {
+            String authToken = context.header("authorization");
             String json = context.body();
             CreateGameData gameRequest = gson.fromJson(json, CreateGameData.class);
-            int gameID = gameService.createGame(gameRequest);
+            int gameID = gameService.createGame(gameRequest, authToken);
             context.status(200);
-            context.result(gson.toJson(gameID));
+            context.result(gson.toJson(Map.of("gameID", gameID)));
         }
 
         catch (BadRequestException error) {

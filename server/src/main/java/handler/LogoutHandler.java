@@ -24,7 +24,7 @@ public class LogoutHandler implements Handler {
         try {
 
             // parse json into authToken
-            String authToken = context.body();
+            String authToken = context.header("authorization");
 
             // check authToken validity
             userService.validateAuth(authToken);

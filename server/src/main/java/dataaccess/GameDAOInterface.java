@@ -10,4 +10,5 @@ public interface GameDAOInterface {
     void save(GameData gameData);
     Collection<GameData> findAllGames();
     void clear();
+    void remove(GameData gameData);
 }

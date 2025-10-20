@@ -3,12 +3,10 @@ package handler;
 import com.google.gson.Gson;
 import exception.BadRequestException;
 import exception.NotAuthException;
-import exception.UsernameTakenException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.AuthData;
 import model.LoginData;
-import model.UserData;
 import service.UserService;
 
 import java.util.Map;
