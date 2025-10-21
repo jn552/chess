@@ -66,10 +66,10 @@ public class UserService {
         }
 
         // get real password
-        String real_pass = userDao.find(username).password();
+        String realPass = userDao.find(username).password();
 
         // check if passwords match
-        if (!password.equals(real_pass)) {
+        if (!password.equals(realPass)) {
             throw new NotAuthException("Error: unauthorized");
         }
 
