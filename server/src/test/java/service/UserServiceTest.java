@@ -33,15 +33,21 @@ class UserServiceTest {
     void registerUser() throws BadRequestException {
         userDao.save(user);
 
+        // add a different username
+        UserData user2 = new UserData("jeremy2", "12345", "jer@email.com");
+        testUserService.registerUser(user2);
+        assert userDao.find("jeremy2") == user2;
+    }
+
+    @Test
+    void registerUserInvalid() {
+        userDao.save(user);
+
         // test registering a taken username
         assertThrows(TakenException.class, () -> {
             testUserService.registerUser(user);
         });
 
-        // add a different username
-        UserData user2 = new UserData("jeremy2", "12345", "jer@email.com");
-        testUserService.registerUser(user2);
-        assert userDao.find("jeremy2") == user2;
     }
 
     @Test
@@ -52,26 +58,34 @@ class UserServiceTest {
         assertDoesNotThrow(()-> {
             testUserService.isUser("jeremy");
         });
+    }
+
+    @Test
+    void isUserInvalid() {
+        userDao.save(user);
 
         // test case where user DNE and throws authError since the username is incorrect
         assertThrows(NotAuthException.class, () -> {
-           testUserService.isUser("bob");
+            testUserService.isUser("bob");
         });
     }
 
     @Test
     void validatePassword() {
+        userDao.save(user);
+        // test to see if it recognizes correct password
+        assertDoesNotThrow(() ->{
+            testUserService.validatePassword(new LoginData("jeremy", "12345"));
+        });
+    }
+
+    @Test
+    void validatePasswordInvalid() {
         // test to see it catches an incorrect password
         userDao.save(user);
         assertThrows(NotAuthException.class, () -> {
             testUserService.validatePassword(new LoginData("jeremy", "99999"));
         });
-
-        // test to see if it recognizes correct password
-        assertDoesNotThrow(() ->{
-            testUserService.validatePassword(new LoginData("jeremy", "12345"));
-        });
-
     }
 
     @Test
@@ -81,6 +95,11 @@ class UserServiceTest {
         assertDoesNotThrow(() -> {
             testUserService.validateAuth("34-53.6");
         });
+    }
+
+    @Test
+    void validateAuthInvalid() {
+        authDao.save(auth);
 
         //testing invalid authToken
         assertThrows(NotAuthException.class, () -> {
@@ -92,14 +111,19 @@ class UserServiceTest {
     void removeAuth() {
         authDao.save(auth);
 
+        // testing if user's auth was removed properly
+        testUserService.removeAuth("34-53.6");
+        assert authDao.find("34-53.6") == null;
+    }
+
+    @Test
+    void removeAuthInvalid() {
+        authDao.save(auth);
+
         // testing removing when user DNE
         assertDoesNotThrow(() -> {
             testUserService.removeAuth("thisAuthTokenDNE");
         });
-
-        // testing if user's auth was removed properly
-        testUserService.removeAuth("34-53.6");
-        assert authDao.find("34-53.6") == null;
 
     }
 }

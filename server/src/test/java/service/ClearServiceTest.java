@@ -28,10 +28,6 @@ class ClearServiceTest {
 
     @Test
     void clearAll() {
-        // testing clearing with nothing in the DAOs doesn't throw exception
-        assertDoesNotThrow(() -> {
-            testClearService.clearAll();
-        });
 
         // add things to each DAO
         gameDao.save(game);
@@ -43,6 +39,15 @@ class ClearServiceTest {
         assert(userDao.find("jeremy") == null);
         assert(gameDao.find(12) == null);
         assert(authDao.find("34-53.6") == null);
-
     }
+
+    @Test
+    void clearAllNoError() {
+        // testing clearing with nothing in the DAOs doesn't throw exception
+        assertDoesNotThrow(() -> {
+            testClearService.clearAll();
+        });
+    }
+
+
 }

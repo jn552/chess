@@ -33,6 +33,12 @@ class GameServiceTest {
         authDao.save(auth);
         testGameService.createGame(new CreateGameData(("testGame")), "34-53.6");
         assert(gameDao.find(1) != null);
+    }
+
+    @Test
+    void createGameInvalid() throws BadRequestException {
+        // adding necessary things to DAOs
+        authDao.save(auth);
 
         assertThrows(BadRequestException.class, () -> {
             testGameService.createGame(new CreateGameData(null), "jeremy");
@@ -51,8 +57,12 @@ class GameServiceTest {
 
         // checking if white username, which I joined as was updated
         assert gameDao.find(4).whiteUsername().equals("jeremy");
+    }
 
+    @Test
+    void joinGameInvalid() throws BadRequestException {
         // add game where white player is already in
+        authDao.save(auth);
         GameData game2 = new GameData(8, "white", null, "testGame", new ChessGame());
         gameDao.save(game2);
 
@@ -65,11 +75,6 @@ class GameServiceTest {
     @Test
     void listGames() {
         authDao.save(auth);
-
-        // test where list games when no games; no error should be thrown throw error
-        assertThrows(NotAuthException.class, () -> {
-            testGameService.listGames("fakeAuth");
-        });
 
         // add a bunch of games
         GameData game1 = new GameData(4, "white", null, "testGame", new ChessGame());
@@ -89,5 +94,16 @@ class GameServiceTest {
         realGames.add(game4);
 
         assert testGameService.listGames("34-53.6").equals(realGames);
+    }
+
+    @Test
+    void listGamesInvalid() {
+        authDao.save(auth);
+
+        // test not auth
+        assertThrows(NotAuthException.class, () -> {
+            testGameService.listGames("fakeAuth");
+        });
+
     }
 }
