@@ -28,35 +28,19 @@ class GameServiceTest {
     GameService testGameService = new GameService(gameDao, authDao);
 
     @Test
-    void createGameBadRequest() {
+    void createGame() throws BadRequestException {
+        // adding necessary things to DAOs
+        authDao.save(auth);
+        testGameService.createGame(new CreateGameData(("testGame")), "34-53.6");
+        assert(gameDao.find(1) != null);
+
         assertThrows(BadRequestException.class, () -> {
             testGameService.createGame(new CreateGameData(null), "jeremy");
         });
     }
 
     @Test
-    void createGameValid() throws BadRequestException {
-        // adding necessary things to DAOs
-        authDao.save(auth);
-        testGameService.createGame(new CreateGameData(("testGame")), "34-53.6");
-        assert(gameDao.find(1) != null);
-    }
-
-    @Test
-    void joinGameInvalid() {
-        // add game where white player is already in
-        GameData game = new GameData(4, "white", null, "testGame", new ChessGame());
-        authDao.save(auth);
-        gameDao.save(game);
-
-        // should reject request to join
-        assertThrows(TakenException.class, () -> {
-            testGameService.joinGame(new JoinRequestData(ChessGame.TeamColor.WHITE, 4),"34-53.6");
-        });
-    }
-
-    @Test
-    void joinGameValid() throws BadRequestException {
+    void joinGame() throws BadRequestException {
         // add game where white player is already in
         GameData game = new GameData(4, null, "black", "testGame", new ChessGame());
         authDao.save(auth);
@@ -67,6 +51,15 @@ class GameServiceTest {
 
         // checking if white username, which I joined as was updated
         assert gameDao.find(4).whiteUsername().equals("jeremy");
+
+        // add game where white player is already in
+        GameData game2 = new GameData(8, "white", null, "testGame", new ChessGame());
+        gameDao.save(game2);
+
+        // should reject request to join
+        assertThrows(TakenException.class, () -> {
+            testGameService.joinGame(new JoinRequestData(ChessGame.TeamColor.WHITE, 8),"34-53.6");
+        });
     }
 
     @Test
