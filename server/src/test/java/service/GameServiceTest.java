@@ -70,16 +70,13 @@ class GameServiceTest {
     }
 
     @Test
-    void listGamesNotAuth() {
-        // test where list games when no games doesn't throw error
+    void listGames() {
+        authDao.save(auth);
+
+        // test where list games when no games; no error should be thrown throw error
         assertThrows(NotAuthException.class, () -> {
             testGameService.listGames("fakeAuth");
         });
-    }
-
-    @Test
-    void listGamesValid() {
-        authDao.save(auth);
 
         // add a bunch of games
         GameData game1 = new GameData(4, "white", null, "testGame", new ChessGame());

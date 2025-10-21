@@ -27,14 +27,12 @@ class ClearServiceTest {
     ClearService testClearService = new ClearService(userDao, authDao, gameDao);
 
     @Test
-    void testClearNoThings() {
+    void clearAll() {
+        // testing clearing with nothing in the DAOs doesn't throw exception
         assertDoesNotThrow(() -> {
             testClearService.clearAll();
         });
-    }
 
-    @Test
-    void clearAll() {
         // add things to each DAO
         gameDao.save(game);
         userDao.save(user);
