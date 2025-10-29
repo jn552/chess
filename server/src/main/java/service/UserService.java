@@ -35,7 +35,11 @@ public class UserService {
         // if no errors then make auth token and save info
         String authToken = makeAuthToken();
         AuthData authData = new AuthData(user.username(), authToken);
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         authDao.save(authData);
 
         return authData;

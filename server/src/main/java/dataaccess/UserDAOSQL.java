@@ -1,8 +1,10 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.UserData;
 
 import java.sql.*;
+import static java.sql.Types.NULL;
 
 public class UserDAOSQL implements UserDAOInterface{
 
@@ -11,8 +13,10 @@ public class UserDAOSQL implements UserDAOInterface{
     }
 
     @Override
-    public void save(UserData user){
-
+    public void save(UserData user) throws DataAccessException {
+        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+        String json = new Gson().toJson(user);
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     @Override
@@ -23,6 +27,24 @@ public class UserDAOSQL implements UserDAOInterface{
     @Override
     public void clear(){
 
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+
+                ps.executeUpdate();
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     private final String[] createStatements = {

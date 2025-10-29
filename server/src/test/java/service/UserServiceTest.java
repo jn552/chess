@@ -2,7 +2,6 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
-import dataaccess.GameDAOMemory;
 import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
 import exception.NotAuthException;
@@ -31,7 +30,11 @@ class UserServiceTest {
 
     @Test
     void registerUser() throws BadRequestException {
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // add a different username
         UserData user2 = new UserData("jeremy2", "12345", "jer@email.com");
@@ -41,7 +44,11 @@ class UserServiceTest {
 
     @Test
     void registerUserInvalid() {
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // test registering a taken username
         assertThrows(TakenException.class, () -> {
@@ -52,7 +59,11 @@ class UserServiceTest {
 
     @Test
     void isUser() {
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // test shouldn't throw any error since "jeremy" is a user
         assertDoesNotThrow(()-> {
@@ -62,7 +73,11 @@ class UserServiceTest {
 
     @Test
     void isUserInvalid() {
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // test case where user DNE and throws authError since the username is incorrect
         assertThrows(NotAuthException.class, () -> {
@@ -72,7 +87,11 @@ class UserServiceTest {
 
     @Test
     void validatePassword() {
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         // test to see if it recognizes correct password
         assertDoesNotThrow(() ->{
             testUserService.validatePassword(new LoginData("jeremy", "12345"));
@@ -82,7 +101,11 @@ class UserServiceTest {
     @Test
     void validatePasswordInvalid() {
         // test to see it catches an incorrect password
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         assertThrows(NotAuthException.class, () -> {
             testUserService.validatePassword(new LoginData("jeremy", "99999"));
         });

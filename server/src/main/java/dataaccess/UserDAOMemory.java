@@ -15,7 +15,7 @@ public class UserDAOMemory implements UserDAOInterface {
 
     @ Override
 
-    public void save(UserData userData){
+    public void save(UserData userData) throws DataAccessException {
         userHash.put(userData.username(), userData);
     }
 
