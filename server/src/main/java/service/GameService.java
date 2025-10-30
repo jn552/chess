@@ -100,6 +100,7 @@ public class GameService {
         else {
             newGameData = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
         }
+        gameDao.remove(new GameData(newGameData.gameID(), null, null, null, null));
         gameDao.save(newGameData);
     }
 

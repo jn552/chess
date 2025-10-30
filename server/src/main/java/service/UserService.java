@@ -81,7 +81,9 @@ public class UserService {
         String realPass = null;
         try {
             realPass = userDao.find(username).password();
-        } catch (dataaccess.DataAccessException e) {
+        }
+
+        catch (dataaccess.DataAccessException e) {
             throw new RuntimeException(e);
         }
 
