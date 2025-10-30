@@ -25,7 +25,7 @@ public class Server {
         }
 
         catch (DataAccessException e) {
-            System.out.println("HEllO");
+            System.out.println("Error making SQL DAOs");
         }
 
         // making services (pass in DAOs into them)
