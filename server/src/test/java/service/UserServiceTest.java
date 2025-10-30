@@ -12,6 +12,7 @@ import model.GameData;
 import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,8 +23,7 @@ class UserServiceTest {
     UserDAOMemory userDao = new UserDAOMemory();
 
     // instantiate things to add to DAOs
-    GameData game = new GameData(12, "testwhite", "testblack", "testgame", new ChessGame());
-    UserData user = new UserData("jeremy", "12345", "jeremy@email.com");
+    UserData user = new UserData("jeremy", BCrypt.hashpw("12345", BCrypt.gensalt()), "jeremy@email.com");
     AuthData auth = new AuthData("jeremy", "34-53.6");
 
     // instantiate the clear service
