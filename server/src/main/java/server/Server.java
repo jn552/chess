@@ -20,7 +20,7 @@ public class Server {
         // instantiate DAOs
         try {
             userDao = new UserDAOSQL();
-            authDao = new AuthDAOMemory();
+            authDao = new AuthDAOSQL();
             gameDao = new GameDAOMemory();
         }
 

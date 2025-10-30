@@ -17,7 +17,6 @@ public class UserDAOSQL implements UserDAOInterface{
               PRIMARY KEY (`username`)
             )
             """};
-
         DAOHelper.configureDatabase(createStatements);
     }
 
