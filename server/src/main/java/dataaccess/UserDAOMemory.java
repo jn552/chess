@@ -10,7 +10,7 @@ public class UserDAOMemory implements UserDAOInterface {
 
     @ Override
     public UserData find(String username) throws DataAccessException {
-        return userHash.get(username);  //return null means user DNE
+        return userHash.get(username);  // return null means user DNE
     }
 
     @ Override

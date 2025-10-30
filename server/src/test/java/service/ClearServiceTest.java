@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAOMemory;
 import dataaccess.UserDAOMemory;
 import model.AuthData;
@@ -27,7 +28,7 @@ class ClearServiceTest {
     ClearService testClearService = new ClearService(userDao, authDao, gameDao);
 
     @Test
-    void clearAll() {
+    void clearAll() throws DataAccessException {
 
         // add things to each DAO
         gameDao.save(game);

@@ -13,10 +13,20 @@ public class Server {
 
     public Server() {
 
-        // instantiate DAOs
         UserDAOInterface userDao = new UserDAOMemory();
         AuthDAOInterface authDao = new AuthDAOMemory();
         GameDAOInterface gameDao = new GameDAOMemory();
+
+        // instantiate DAOs
+        try {
+            userDao = new UserDAOSQL();
+            authDao = new AuthDAOMemory();
+            gameDao = new GameDAOMemory();
+        }
+
+        catch (DataAccessException e) {
+            System.out.println("HEllO");
+        }
 
         // making services (pass in DAOs into them)
         UserService userService = new UserService(userDao, authDao);
@@ -43,8 +53,6 @@ public class Server {
         javalin.get("/game", listGameHandler);
         javalin.post("/game", createGameHandler);
         javalin.put("/game", joinGameHandler);
-
-
 
     }
 
