@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import exception.BadRequestException;
 import exception.NotAuthException;
 import io.javalin.http.Context;
@@ -35,6 +36,12 @@ public class CreateGameHandler implements Handler {
         catch (NotAuthException error){
             context.status(401);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
+        }
+
+        catch (DataAccessException error){
+            context.status(500);
+            context.result(gson.toJson(Map.of("message", error.getMessage())));
+
         }
 
     }

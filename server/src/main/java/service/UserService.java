@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAOInterface;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAOInterface;
 import exception.BadRequestException;
 import exception.NotAuthException;
@@ -22,7 +23,7 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public AuthData registerUser(UserData user) throws BadRequestException {
+    public AuthData registerUser(UserData user) throws BadRequestException, DataAccessException {
 
         // check if any of UserData fields are null
         if (user.username() == null || user.password() == null || user.email() == null){
@@ -49,7 +50,7 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public void isUser(String username) throws BadRequestException {
+    public void isUser(String username) throws BadRequestException, DataAccessException {
         if (username == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -60,7 +61,7 @@ public class UserService {
 
     }
 
-    public AuthData validatePassword(LoginData loginData) throws BadRequestException {
+    public AuthData validatePassword(LoginData loginData) throws BadRequestException, DataAccessException {
 
         // unpack info
         String username = loginData.username();
@@ -74,7 +75,7 @@ public class UserService {
         // get real password
         String realPass = null;
 
-        realPass = userDao.find(username).password();  // this is the hashed passwrod
+        realPass = userDao.find(username).password();  // this is the hashed password
 
         // check if passwords match
         if (!BCrypt.checkpw(password, realPass)) {
@@ -83,12 +84,13 @@ public class UserService {
 
         // make new authData and save it
         AuthData authData = new AuthData(username, makeAuthToken());
+
         authDao.save(authData);
 
         return authData;
     }
 
-    public void validateAuth(String authToken) throws BadRequestException {
+    public void validateAuth(String authToken) throws BadRequestException, DataAccessException{
 
         // check if authToken is null
         if (authToken == null) {
@@ -101,7 +103,7 @@ public class UserService {
         }
     }
 
-    public void removeAuth(String authToken){
+    public void removeAuth(String authToken) throws DataAccessException{
         authDao.remove(authToken);
     }
 }

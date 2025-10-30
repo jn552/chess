@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAOInterface;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAOInterface;
 import exception.BadRequestException;
 import exception.NotAuthException;
@@ -22,7 +23,7 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    private void validateAuth(String authToken) {
+    private void validateAuth(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new NotAuthException("Error: unauthorized");
         }
@@ -31,11 +32,11 @@ public class GameService {
         }
     }
 
-    private void saveGame(GameData gameData) {
+    private void saveGame(GameData gameData) throws DataAccessException {
         gameDao.save(gameData);
     }
 
-    public int createGame(CreateGameData createGameData, String authToken) throws BadRequestException {
+    public int createGame(CreateGameData createGameData, String authToken) throws BadRequestException, DataAccessException {
 
 
         // checking nullity (if authToken is null it means not authorized)
@@ -47,8 +48,9 @@ public class GameService {
         validateAuth(authToken);
 
         // generate gameID and make gameData object
-        int gameID = gameIDGenerator++;
+        int gameID = gameIDGenerator;
         GameData gameData = new GameData(gameID, null, null, createGameData.gameName(), new ChessGame());
+        gameIDGenerator += 1;
 
         // add gameData to dao
         saveGame(gameData);
@@ -69,7 +71,7 @@ public class GameService {
         }
     }
 
-    public void joinGame(JoinRequestData joinRequestData, String authToken) throws BadRequestException {
+    public void joinGame(JoinRequestData joinRequestData, String authToken) throws BadRequestException, DataAccessException {
         //unpack info from request
         int gameID = joinRequestData.gameID();
         ChessGame.TeamColor teamColor = joinRequestData.playerColor();
@@ -104,7 +106,7 @@ public class GameService {
         gameDao.save(newGameData);
     }
 
-    public Collection<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
         //validate auth
         validateAuth(authToken);
         return gameDao.findAllGames();

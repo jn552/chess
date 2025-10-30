@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import exception.BadRequestException;
 import exception.NotAuthException;
 import exception.TakenException;
@@ -42,6 +43,12 @@ public class JoinGameHandler implements Handler {
         catch (TakenException error) {
             context.status(403);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
+        }
+
+        catch (DataAccessException error){
+            context.status(500);
+            context.result(gson.toJson(Map.of("message", error.getMessage())));
+
         }
 
     }

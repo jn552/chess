@@ -26,7 +26,7 @@ public class GameDAOSQL implements GameDAOInterface{
     }
 
     @Override
-    public GameData find(Integer gameID) {
+    public GameData find(Integer gameID) throws DataAccessException {
         var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM `game` WHERE gameID=?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -47,13 +47,13 @@ public class GameDAOSQL implements GameDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println(("Error when finding game by ID"));
+            throw new DataAccessException("Error: error finding game");
         }
         return null;
     }
 
     @Override
-    public void save(GameData gameData){
+    public void save(GameData gameData) throws DataAccessException{
         var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
         String json = new Gson().toJson(gameData.game());
         try (Connection conn = DatabaseManager.getConnection();
@@ -67,13 +67,13 @@ public class GameDAOSQL implements GameDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error when saving gameDATA");
+            throw new DataAccessException("Error: error saving GameData");
         }
 
     }
 
     @Override
-    public Collection<GameData> findAllGames(){
+    public Collection<GameData> findAllGames() throws DataAccessException{
 
         var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM `game`";
         Collection<GameData> gameList = new ArrayList<>();
@@ -94,14 +94,14 @@ public class GameDAOSQL implements GameDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error when listing all games");
+            throw new DataAccessException("Error: error finding all games");
         }
 
         return gameList;
     }
 
     @Override
-    public void clear(){
+    public void clear() throws DataAccessException{
         var statement = "TRUNCATE `game`";
 
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -111,12 +111,11 @@ public class GameDAOSQL implements GameDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error when clearing GameDAO");
+            throw new DataAccessException("Error: error clearing game dao");
         }
-
     }
 
-    public void remove(GameData gameData){
+    public void remove(GameData gameData) throws DataAccessException{
         var statement = "DELETE FROM `game` WHERE gameID = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -125,7 +124,7 @@ public class GameDAOSQL implements GameDAOInterface{
         }
 
         catch (Exception e){
-            System.out.println("Error when removing a game from Game table");
+            throw new DataAccessException("Error: error finding user");
         }
     }
 }

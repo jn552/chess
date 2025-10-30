@@ -6,9 +6,9 @@ import java.util.Collection;
 
 public interface GameDAOInterface {
 
-    GameData find(Integer gameID);
-    void save(GameData gameData);
-    Collection<GameData> findAllGames();
-    void clear();
-    void remove(GameData gameData);
+    GameData find(Integer gameID) throws DataAccessException;
+    void save(GameData gameData) throws DataAccessException;
+    Collection<GameData> findAllGames() throws DataAccessException;
+    void clear() throws DataAccessException;
+    void remove(GameData gameData) throws DataAccessException;
 }

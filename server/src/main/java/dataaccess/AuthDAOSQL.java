@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +26,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
     }
 
     @ Override
-    public AuthData find(String authToken){
+    public AuthData find(String authToken) throws DataAccessException{
         var statement = "SELECT username, authToken FROM `auth` WHERE authToken=?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -43,14 +44,14 @@ public class AuthDAOSQL implements AuthDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error with finding auhData");
+            throw new DataAccessException("Error: error finding authdata");
         }
 
         return null;
     }
 
     @ Override
-    public void save(AuthData authData){
+    public void save(AuthData authData) throws DataAccessException{
         var statement = "INSERT INTO `auth` (username, authToken) VALUES (?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -61,12 +62,12 @@ public class AuthDAOSQL implements AuthDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error with saving auhData");
+            throw new DataAccessException("Error savnig auth data");
         }
     }
 
     @ Override
-    public void clear(){
+    public void clear() throws DataAccessException {
         var statement = "TRUNCATE `auth`";
 
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -76,12 +77,12 @@ public class AuthDAOSQL implements AuthDAOInterface{
         }
 
         catch (Exception e) {
-            System.out.println("Error when clearing AuthDAO");
+            throw new DataAccessException("Error: error clearing authDao");
         }
     }
 
     @ Override
-    public void remove(String authToken){
+    public void remove(String authToken) throws DataAccessException{
         var statement = "DELETE FROM `auth` WHERE authToken = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -90,7 +91,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
         }
 
         catch (Exception e){
-            System.out.println("Error when removing a user from AUTH table");
+            throw new DataAccessException("Error: error removing auth data");
         }
     }
 

@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAOMemory;
 import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
@@ -28,11 +29,11 @@ class GameServiceTest {
     GameService testGameService = new GameService(gameDao, authDao);
 
     @Test
-    void createGame() throws BadRequestException {
+    void createGame() throws BadRequestException, DataAccessException {
         // adding necessary things to DAOs
         authDao.save(auth);
         testGameService.createGame(new CreateGameData(("testGame")), "34-53.6");
-        assert(gameDao.find(1) != null);
+        assert(gameDao.find(2).gameName().equals("testGame"));
     }
 
     @Test
@@ -46,7 +47,7 @@ class GameServiceTest {
     }
 
     @Test
-    void joinGame() throws BadRequestException {
+    void joinGame() throws BadRequestException, DataAccessException{
         // add game where white player is already in
         GameData game = new GameData(4, null, "black", "testGame", new ChessGame());
         authDao.save(auth);
@@ -73,7 +74,7 @@ class GameServiceTest {
     }
 
     @Test
-    void listGames() {
+    void listGames() throws DataAccessException {
         authDao.save(auth);
 
         // add a bunch of games

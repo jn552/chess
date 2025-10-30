@@ -16,11 +16,11 @@ public class ClearService {
         this.gameDao = gameDao;
     }
 
-    private void clearAuth() {
+    private void clearAuth() throws DataAccessException{
         authDao.clear();
     }
 
-    private void clearGame(){
+    private void clearGame() throws DataAccessException{
         gameDao.clear();
     }
 

@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAOMemory;
 import exception.BadRequestException;
 import exception.NotAuthException;
@@ -29,7 +30,7 @@ class UserServiceTest {
     UserService testUserService = new UserService(userDao, authDao);
 
     @Test
-    void registerUser() throws BadRequestException {
+    void registerUser() throws BadRequestException, DataAccessException {
         userDao.save(user);
 
         // add a different username
@@ -113,7 +114,7 @@ class UserServiceTest {
     }
 
     @Test
-    void removeAuth() {
+    void removeAuth() throws DataAccessException{
         authDao.save(auth);
 
         // testing if user's auth was removed properly
