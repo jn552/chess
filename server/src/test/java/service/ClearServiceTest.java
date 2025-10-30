@@ -31,12 +31,20 @@ class ClearServiceTest {
 
         // add things to each DAO
         gameDao.save(game);
-        userDao.save(user);
+        try {
+            userDao.save(user);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         authDao.save(auth);
 
         // make sure clear actually clears
         testClearService.clearAll();
-        assert(userDao.find("jeremy") == null);
+        try {
+            assert(userDao.find("jeremy") == null);
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         assert(gameDao.find(12) == null);
         assert(authDao.find("34-53.6") == null);
     }

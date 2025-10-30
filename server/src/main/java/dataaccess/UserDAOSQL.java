@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import static java.sql.Types.NULL;
@@ -15,8 +16,8 @@ public class UserDAOSQL implements UserDAOInterface{
     @Override
     public void save(UserData user) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        String json = new Gson().toJson(user);
-        executeUpdate(statement, user.username(), user.password(), user.email());
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        executeUpdate(statement, user.username(), hashedPassword, user.email());
     }
 
     @Override
@@ -38,8 +39,9 @@ public class UserDAOSQL implements UserDAOInterface{
     }
 
     @Override
-    public void clear(){
-
+    public void clear() throws DataAccessException{
+        var statement = "TRUNCATE user";
+        executeUpdate(statement);
     }
 
     private UserData readUser(ResultSet rs) throws SQLException{
