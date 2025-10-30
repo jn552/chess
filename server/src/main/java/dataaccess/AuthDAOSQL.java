@@ -1,8 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,7 +51,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
 
     @ Override
     public void save(AuthData authData){
-        var statement = "INSERT INTO `auth` (username, authToken) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO `auth` (username, authToken) VALUES (?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
 
@@ -69,12 +67,31 @@ public class AuthDAOSQL implements AuthDAOInterface{
 
     @ Override
     public void clear(){
+        var statement = "TRUNCATE `auth`";
 
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        }
+
+        catch (Exception e) {
+            System.out.println("Error when clearing AuthDAO");
+        }
     }
 
     @ Override
     public void remove(String authToken){
+        var statement = "DELETE FROM `auth` WHERE authToken = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+            ps.setString(1, authToken);
+            ps.executeUpdate();
+        }
 
+        catch (Exception e){
+            System.out.println("Error when removing a user from AUTH table");
+        }
     }
 
 }
