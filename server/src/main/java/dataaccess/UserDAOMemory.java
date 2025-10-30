@@ -9,13 +9,13 @@ public class UserDAOMemory implements UserDAOInterface {
     private final Map<String, UserData> userHash = new HashMap<>();
 
     @ Override
-    public UserData find(String username) throws DataAccessException {
+    public UserData find(String username) {
         return userHash.get(username);  // return null means user DNE
     }
 
     @ Override
 
-    public void save(UserData userData) throws DataAccessException {
+    public void save(UserData userData) {
         userHash.put(userData.username(), userData);
     }
 

@@ -21,7 +21,7 @@ public class UserDAOSQL implements UserDAOInterface{
     }
 
     @Override
-    public void save(UserData user) throws DataAccessException {
+    public void save(UserData user) {
         var statement = "INSERT INTO `user` (username, password, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         try (Connection conn = DatabaseManager.getConnection();
@@ -34,12 +34,12 @@ public class UserDAOSQL implements UserDAOInterface{
         }
 
         catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            System.out.println("error when saving user");
         }
     }
 
     @Override
-    public UserData find (String username) throws DataAccessException {
+    public UserData find (String username) {
         var statement = "SELECT username, password, email FROM `user` WHERE username=?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -58,13 +58,13 @@ public class UserDAOSQL implements UserDAOInterface{
         }
 
         catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            System.out.println("error when finding user");
         }
         return null;
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() {
         var statement = "TRUNCATE `user`";
 
         try (Connection conn = DatabaseManager.getConnection()) {

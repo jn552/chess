@@ -8,6 +8,7 @@ import exception.TakenException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -28,23 +29,17 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
         // check if username is taken
-        try {
-            if (userDao.find(user.username()) != null) {
-                throw new TakenException("Error: already taken");
-            }
+
+        if (userDao.find(user.username()) != null) {
+            throw new TakenException("Error: already taken");
         }
-        catch (dataaccess.DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+
 
         // if no errors then make auth token and save info
         String authToken = makeAuthToken();
         AuthData authData = new AuthData(user.username(), authToken);
-        try {
-            userDao.save(user);
-        } catch (dataaccess.DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+
+        userDao.save(user);
         authDao.save(authData);
 
         return authData;
@@ -58,13 +53,11 @@ public class UserService {
         if (username == null) {
             throw new BadRequestException("Error: bad request");
         }
-        try {
-            if (userDao.find(username) == null){
-                throw new NotAuthException("Error: unauthorized");
-            }
-        } catch (dataaccess.DataAccessException e) {
-            throw new RuntimeException(e);
+
+        if (userDao.find(username) == null){
+            throw new NotAuthException("Error: unauthorized");
         }
+
     }
 
     public AuthData validatePassword(LoginData loginData) throws BadRequestException {
@@ -80,16 +73,11 @@ public class UserService {
 
         // get real password
         String realPass = null;
-        try {
-            realPass = userDao.find(username).password();
-        }
 
-        catch (dataaccess.DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        realPass = userDao.find(username).password();  // this is the hashed passwrod
 
         // check if passwords match
-        if (!password.equals(realPass)) {
+        if (!BCrypt.checkpw(password, realPass)) {
             throw new NotAuthException("Error: unauthorized");
         }
 
