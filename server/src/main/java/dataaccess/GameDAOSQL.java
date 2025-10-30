@@ -80,10 +80,30 @@ public class GameDAOSQL implements GameDAOInterface{
 
     @Override
     public void clear(){
+        var statement = "TRUNCATE `game`";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        }
+
+        catch (Exception e) {
+            System.out.println("Error when clearing GameDAO");
+        }
 
     }
 
     public void remove(GameData gameData){
+        var statement = "DELETE FROM `game` WHERE gameID = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameData.gameID());
+            ps.executeUpdate();
+        }
 
+        catch (Exception e){
+            System.out.println("Error when removing a game from Game table");
+        }
     }
 }
