@@ -32,7 +32,8 @@ public class UserService {
             if (userDao.find(user.username()) != null) {
                 throw new TakenException("Error: already taken");
             }
-        } catch (dataaccess.DataAccessException e) {
+        }
+        catch (dataaccess.DataAccessException e) {
             throw new RuntimeException(e);
         }
 

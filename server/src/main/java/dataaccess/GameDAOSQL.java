@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,14 +54,15 @@ public class GameDAOSQL implements GameDAOInterface{
 
     @Override
     public void save(GameData gameData){
-        var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?)";
+        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?, ?, ?)";
         String json = new Gson().toJson(gameData.game());
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement ps = conn.prepareStatement(statement)) {
-            ps.setString(1, gameData.whiteUsername());
-            ps.setString(2, gameData.blackUsername());
-            ps.setString(3, gameData.gameName());
-            ps.setString(4, json);
+            ps.setInt(1, gameData.gameID());
+            ps.setString(2, gameData.whiteUsername());
+            ps.setString(3, gameData.blackUsername());
+            ps.setString(4, gameData.gameName());
+            ps.setString(5, json);
             ps.executeUpdate();
         }
 
@@ -74,7 +74,29 @@ public class GameDAOSQL implements GameDAOInterface{
 
     @Override
     public Collection<GameData> findAllGames(){
+
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM `game`";
         Collection<GameData> gameList = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+                 try (ResultSet rs = ps.executeQuery()) {
+                     while (rs.next()) {
+                         int gameIDNum = rs.getInt("gameID");
+                         String whiteUsername = rs.getString("whiteUsername");
+                         String blackUsername = rs.getString("blackUsername");
+                         String gameName = rs.getString("gameName");
+                         String json = rs.getString("json");
+                         ChessGame chessGame = new Gson().fromJson(json, ChessGame.class);
+                         gameList.add(new GameData(gameIDNum, whiteUsername, blackUsername, gameName, chessGame));
+                     }
+                 }
+        }
+
+        catch (Exception e) {
+            System.out.println("Error when listing all games");
+        }
+
         return gameList;
     }
 
