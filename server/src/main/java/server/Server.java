@@ -21,7 +21,7 @@ public class Server {
         try {
             userDao = new UserDAOSQL();
             authDao = new AuthDAOSQL();
-            gameDao = new GameDAOMemory();
+            gameDao = new GameDAOSQL();
         }
 
         catch (DataAccessException e) {

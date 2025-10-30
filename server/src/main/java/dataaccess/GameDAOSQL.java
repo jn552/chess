@@ -1,12 +1,13 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
+import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.sql.*;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class GameDAOSQL implements GameDAOInterface{
 
@@ -27,7 +28,29 @@ public class GameDAOSQL implements GameDAOInterface{
 
     @Override
     public GameData find(Integer gameID) {
-        return new GameData(0, null, null, null, null);
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM `game` WHERE gameID=?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+
+            ps.setInt(1, gameID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int gameIDNum = rs.getInt("gameID");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    String gameName = rs.getString("gameName");
+                    String json = rs.getString("json");
+                    ChessGame chessGame = new Gson().fromJson(json, ChessGame.class);
+                    return new GameData(gameIDNum, whiteUsername, blackUsername, gameName, chessGame);
+                }
+            }
+        }
+
+        catch (Exception e) {
+            System.out.println(("Error when finding game by ID"));
+        }
+        return null;
     }
 
     @Override
