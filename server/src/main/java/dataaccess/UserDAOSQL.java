@@ -20,8 +20,21 @@ public class UserDAOSQL implements UserDAOInterface{
     }
 
     @Override
-    public UserData find(String username){
-        return new UserData(null, null, null);
+    public UserData find (String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
     }
 
     @Override
@@ -29,7 +42,15 @@ public class UserDAOSQL implements UserDAOInterface{
 
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+    private UserData readUser(ResultSet rs) throws SQLException{
+        String username = rs.getString("username");
+        String password = rs.getString("password");
+        String email = rs.getString("email");
+
+        return new UserData(username, password, email);
+    }
+
+    private void executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 for (int i = 0; i < params.length; i++) {
@@ -39,8 +60,6 @@ public class UserDAOSQL implements UserDAOInterface{
                 }
 
                 ps.executeUpdate();
-
-                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));

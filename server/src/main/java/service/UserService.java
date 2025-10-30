@@ -28,8 +28,12 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
         // check if username is taken
-        if (userDao.find(user.username()) != null) {
-            throw new TakenException("Error: already taken");
+        try {
+            if (userDao.find(user.username()) != null) {
+                throw new TakenException("Error: already taken");
+            }
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
         }
 
         // if no errors then make auth token and save info
@@ -53,8 +57,12 @@ public class UserService {
         if (username == null) {
             throw new BadRequestException("Error: bad request");
         }
-        if (userDao.find(username) == null){
-            throw new NotAuthException("Error: unauthorized");
+        try {
+            if (userDao.find(username) == null){
+                throw new NotAuthException("Error: unauthorized");
+            }
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -70,7 +78,12 @@ public class UserService {
         }
 
         // get real password
-        String realPass = userDao.find(username).password();
+        String realPass = null;
+        try {
+            realPass = userDao.find(username).password();
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         // check if passwords match
         if (!password.equals(realPass)) {

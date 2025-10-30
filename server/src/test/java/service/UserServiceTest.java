@@ -39,7 +39,11 @@ class UserServiceTest {
         // add a different username
         UserData user2 = new UserData("jeremy2", "12345", "jer@email.com");
         testUserService.registerUser(user2);
-        assert userDao.find("jeremy2") == user2;
+        try {
+            assert userDao.find("jeremy2") == user2;
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
