@@ -39,16 +39,16 @@ public class LoginHandler implements Handler {
             context.result(gson.toJson(Map.of("message", error.getMessage())));
         }
 
+        catch (DataAccessException error){
+            context.status(500);
+            context.result(gson.toJson(Map.of("message", error.getMessage())));
+        }
+
         catch (NotAuthException error){
             context.status(401);
             context.result(gson.toJson(Map.of("message", error.getMessage())));
         }
 
-        catch (DataAccessException error){
-            context.status(500);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
-
-        }
 
     }
 
