@@ -86,7 +86,7 @@ class AuthDAOSQLTest {
     void removeNegative() {
         // making sure clearing an empty table will not throw an error
         assertDoesNotThrow(() -> {
-            authDao.remove("hello");  // removing something thats not there doesn't throw error
+            authDao.remove("hello");  // removing something that's not there doesn't throw error
         });
     }
 

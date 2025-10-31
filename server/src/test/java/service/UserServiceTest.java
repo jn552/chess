@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.AuthDAOMemory;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAOMemory;
@@ -8,7 +7,6 @@ import exception.BadRequestException;
 import exception.NotAuthException;
 import exception.TakenException;
 import model.AuthData;
-import model.GameData;
 import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
