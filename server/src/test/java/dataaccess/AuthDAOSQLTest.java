@@ -13,85 +13,57 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthDAOSQLTest {
 
     // instantiate DAO
-    AuthDAOMemory authDao = new AuthDAOMemory();
+    AuthDAOSQL authDao = new AuthDAOSQL();
 
     // instantiate things to add to DAOs
-    AuthData auth = new AuthData("jeremy", "34-53.6");
     AuthData auth2 = new AuthData("jeremy2", "hello");
 
+    AuthDAOSQLTest() throws DataAccessException {
+    }
+
     @Test
-    void find() {
+    void find() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
         assert authDao.find("hello").equals(auth2);
     }
 
     @Test
-    void findNegative() {
+    void findNegative() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
+        // making sure its not finding somethign thats not supposed to be there
         assert authDao.find("notanauthtoken") == null;
     }
 
     @Test
-    void save() {
+    void save() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
-
-        var statement = "SELECT username, authToken FROM `auth` WHERE authToken=?";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(statement)) {
-
-            ps.setInt(1, 3);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String name = rs.getString("username");
-                    String authenticationToken = rs.getString("authToken");
-
-                    assert name.equals("jeremy2");
-                    assert authenticationToken.equals("hello");
-                }
-            }
-        }
-
-        catch (Exception e) {
-            System.out.println("Internal Error");
-        }
-
+        assert authDao.find("hello").username().equals("jeremy2");
     }
 
     @Test
     void saveNegative() {
-        authDao.save(auth2);
-
-        var statement = "SELECT username, authToken FROM `auth` WHERE authToken=?";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(statement)) {
-
-            ps.setString(1, "hello");
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String name = rs.getString("username");
-
-                    assert !name.equals("cclearlynotthis");
-
-                }
-            }
-        }
-
-        catch (Exception e) {
-            System.out.println("Internal Error");
-        }
+        assertThrows(DataAccessException.class, () -> {
+            // no duplicates
+            authDao.clear();
+            authDao.save(auth2);
+            authDao.save(auth2);
+        });
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
         authDao.clear();
         assert authDao.find("hello") == null;
     }
 
     @Test
-    void clearNegative() {
+    void clearNegative() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
         authDao.clear();
 
@@ -103,7 +75,8 @@ class AuthDAOSQLTest {
     }
 
     @Test
-    void remove() {
+    void remove() throws DataAccessException {
+        authDao.clear();
         authDao.save(auth2);
         authDao.remove("hello");
         assert authDao.find("hello") == null;
