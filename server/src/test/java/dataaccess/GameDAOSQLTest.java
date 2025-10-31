@@ -14,37 +14,40 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameDAOSQLTest {
 
     // instantiate DAO
-    GameDAOMemory gameDao = new GameDAOMemory();
+    GameDAOSQL gameDao = new GameDAOSQL();
 
     // instantiate things to add to DAOs
     GameData gameData = new GameData(1, "jeremy", "bob", "testGame", new ChessGame());
     GameData gameData2 = new GameData(2, "jeremy2", "bob2", "testGame2", new ChessGame());
 
+    GameDAOSQLTest() throws DataAccessException {
+    }
+
     @Test
-    void find() {
+    void find() throws DataAccessException {
         gameDao.save(gameData);
         assert gameDao.find(1).whiteUsername().equals("jeremy");
     }
 
     @Test
-    void findNegative() {
+    void findNegative() throws DataAccessException {
         assert gameDao.find(345) == null;
     }
 
     @Test
-    void save() {
+    void save() throws DataAccessException {
         gameDao.save(gameData);
         assert gameDao.find(1) != null;
     }
 
     @Test
-    void saveNegative() {
+    void saveNegative() throws DataAccessException {
         gameDao.save(gameData);
         assert !gameDao.find(1).whiteUsername().equals("clearlnotthisagaini");
     }
 
     @Test
-    void findAllGames() {
+    void findAllGames() throws DataAccessException {
         gameDao.save(gameData);
         gameDao.save(gameData2);
         Collection<GameData> games = new ArrayList<>();
@@ -56,14 +59,14 @@ class GameDAOSQLTest {
     }
 
     @Test
-    void findAllGamesNegative() {
+    void findAllGamesNegative() throws DataAccessException {
         // checking case where games list is empty
         Collection<GameData> games = new ArrayList<>();
         assert gameDao.findAllGames().equals(games);
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
         gameDao.save(gameData);
         gameDao.save(gameData2);
         gameDao.clear();
@@ -80,7 +83,7 @@ class GameDAOSQLTest {
     }
 
     @Test
-    void remove() {
+    void remove() throws DataAccessException {
         gameDao.save(gameData);
         gameDao.remove(gameData);
         assert gameDao.find(1) == null;
