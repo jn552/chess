@@ -15,7 +15,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS  auth (
-              `username` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL UNIQUE,
               `authToken` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`)
             )

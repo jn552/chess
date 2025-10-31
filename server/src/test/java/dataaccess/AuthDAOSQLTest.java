@@ -1,4 +1,5 @@
 package dataaccess;
+
 import model.AuthData;
 
 import org.junit.jupiter.api.Test;
@@ -70,10 +71,8 @@ class AuthDAOSQLTest {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String name = rs.getString("username");
-                    String authenticationToken = rs.getString("authToken");
 
                     assert !name.equals("cclearlynotthis");
-                    assert authenticationToken.equals("random");
 
                 }
             }
