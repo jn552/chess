@@ -25,6 +25,7 @@ class GameDAOSQLTest {
 
     @Test
     void find() throws DataAccessException {
+        gameDao.clear();
         gameDao.save(gameData);
         assert gameDao.find(1).whiteUsername().equals("jeremy");
     }
@@ -36,18 +37,24 @@ class GameDAOSQLTest {
 
     @Test
     void save() throws DataAccessException {
+        gameDao.clear();
         gameDao.save(gameData);
         assert gameDao.find(1) != null;
     }
 
     @Test
-    void saveNegative() throws DataAccessException {
-        gameDao.save(gameData);
-        assert !gameDao.find(1).whiteUsername().equals("clearlnotthisagaini");
+    void saveNegative() {
+        assertThrows(DataAccessException.class, () -> {
+            // no duplicates
+            gameDao.clear();
+            gameDao.save(gameData);
+            gameDao.save(gameData);
+        });
     }
 
     @Test
     void findAllGames() throws DataAccessException {
+        gameDao.clear();
         gameDao.save(gameData);
         gameDao.save(gameData2);
         Collection<GameData> games = new ArrayList<>();
@@ -61,12 +68,14 @@ class GameDAOSQLTest {
     @Test
     void findAllGamesNegative() throws DataAccessException {
         // checking case where games list is empty
+        gameDao.clear();
         Collection<GameData> games = new ArrayList<>();
         assert gameDao.findAllGames().equals(games);
     }
 
     @Test
     void clear() throws DataAccessException {
+        gameDao.clear();
         gameDao.save(gameData);
         gameDao.save(gameData2);
         gameDao.clear();
@@ -84,6 +93,7 @@ class GameDAOSQLTest {
 
     @Test
     void remove() throws DataAccessException {
+        gameDao.clear();
         gameDao.save(gameData);
         gameDao.remove(gameData);
         assert gameDao.find(1) == null;
