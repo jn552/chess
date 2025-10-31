@@ -23,9 +23,6 @@ public class Server {
             userDao = new UserDAOSQL();
             authDao = new AuthDAOSQL();
             gameDao = new GameDAOSQL();
-            userDao.clear();
-            authDao.clear();
-            gameDao.clear();
         }
 
         catch (DataAccessException e) {

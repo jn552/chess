@@ -13,7 +13,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS  auth (
-              `username` varchar(256) NOT NULL UNIQUE,
+              `username` varchar(256) NOT NULL,
               `authToken` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`)
             )
@@ -60,7 +60,7 @@ public class AuthDAOSQL implements AuthDAOInterface{
         }
 
         catch (Exception e) {
-            throw new DataAccessException("Error savnig auth data");
+            throw new DataAccessException(e.getMessage());
         }
     }
 
