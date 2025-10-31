@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.sql.Types.NULL;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameDAOSQLTest {
@@ -74,14 +73,24 @@ class GameDAOSQLTest {
 
     @Test
     void clearNegative() {
+        // making sure clearing an empty table will not throw an error
+        assertDoesNotThrow(() -> {
+            gameDao.clear();
+        });
     }
 
     @Test
     void remove() {
+        gameDao.save(gameData);
+        gameDao.remove(gameData);
+        assert gameDao.find(1) == null;
     }
 
     @Test
     void removeNegative() {
+        // making sure removing something that's not there will not throw an error
+        assertDoesNotThrow(() -> {
+            gameDao.remove(gameData2);
+        });
     }
-
 }
