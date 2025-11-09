@@ -1,12 +1,13 @@
 package ui;
 
 import com.google.gson.Gson;
-import model.UserData;
+import model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -22,11 +23,27 @@ public class ServerFacade {
         return handleResponse(response, UserData.class);
     }
 
-    public LoginResult login(LoginResult request) {
+    public AuthData login(LoginData loginData) {
         //example usesed EndpointResult as a standin i think
     }
 
-    public JoinResult joinGame(JoinRequest request) {
+    public void logout(String authToken) {
+        //request here is  a auth tok
+    }
+
+    public Collection<GameData> listGames(String authToken) {
+        // request is auth token
+    }
+
+    public String createGame(CreateGameData createGameData) {
+        //req is CreateGameDAta record class
+    }
+
+    public void joinGame(JoinRequestData joinRequestData) {
+
+    }
+
+    public void clear() {
 
     }
 
@@ -60,6 +77,23 @@ public class ServerFacade {
     }
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException{
-        //write this
+        var status = response.statusCode();
+        if (!isSuccessful(status)) {
+            var body = response.body();
+            if (body !=null) {
+                throw ResponseException.fromJson(body);
+            }
+            throw new ResposeException(ResponseException.fromHttpStatusCode(status), "failure: " + status);
+
+        }
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
+    }
+
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
     }
 }
