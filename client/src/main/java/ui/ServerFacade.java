@@ -28,7 +28,7 @@ public class ServerFacade {
     }
 
     public void logout(String authToken) {
-        //request here is  a auth tok
+        //request here is auth tok
     }
 
     public Collection<GameData> listGames(String authToken) {
@@ -72,7 +72,7 @@ public class ServerFacade {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         }
         catch (Exception ex) {
-            throw new ResponseException(RepsonseExcpetion.code.ServerError, ex.getLocalizedMessage());
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getLocalizedMessage());
         }
     }
 
@@ -83,7 +83,7 @@ public class ServerFacade {
             if (body !=null) {
                 throw ResponseException.fromJson(body);
             }
-            throw new ResposeException(ResponseException.fromHttpStatusCode(status), "failure: " + status);
+            throw new ResponseException(ResponseException.fromHttpStatusCode(status), "failure: " + status);
 
         }
         if (responseClass != null) {

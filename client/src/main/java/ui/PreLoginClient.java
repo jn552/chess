@@ -27,7 +27,7 @@ public class PreLoginClient {
                 default -> help();
             };
         }
-        catch (ResponseExeption ex) {
+        catch (ResponseException ex) {
             return ex.getMessage();
         }
     }
@@ -40,7 +40,8 @@ public class PreLoginClient {
             return String.format("Loggin in as %s. ", username);
         }
 
-        throw new ResponseException(400, "Expected: <username> <password>");
+        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
+        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
     }
 
 
