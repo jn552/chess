@@ -2,6 +2,7 @@ package ui;
 
 import com.sun.nio.sctp.NotificationHandler;
 
+import java.net.http.WebSocket;
 import java.util.Arrays;
 
 public class PreLoginClient {
@@ -29,6 +30,17 @@ public class PreLoginClient {
         catch (ResponseExeption ex) {
             return ex.getMessage();
         }
+    }
+
+    public String login(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            state = State.SIGNEDIN;
+            username = String.join(" ", params);
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            return String.format("Loggin in as %s. ", username);
+        }
+
+        throw new ResponseException(400, "Expected: <username> <password>");
     }
 
 
