@@ -1,4 +1,7 @@
 import chess.*;
+import model.AuthData;
+import ui.PostLoginRepl;
+import ui.PreLoginRepl;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,8 +11,21 @@ public class Main {
         // i think the above code is just example filler
 
         //store server url
+        String serverUrl = "INSERT URL HERE";
 
         // while true
+        while (true) {
+            PreLoginRepl preLoginRepl = new PreLoginRepl(serverUrl);
+            AuthData authData = preLoginRepl.run();
+
+            // null check, if so uesr quit so break loop
+            if (authData == null) {
+                break;
+            }
+
+            PostLoginRepl postLoginRepl = new PostLoginRepl(serverUrl, authData);
+            postLoginRepl.run();
+        }
             // run pre login repl (make it return authdata if logged in or registered, and null if quit
             //store authdata retreved from the prelogin run
             // if auth == null then break loop and user quit so exit
@@ -20,5 +36,6 @@ public class Main {
         // NOTE: post login repl should start the game repl loop when someone does "join"
 
         // outside while, print exit meessage
+        System.out.println("BYE");
     }
 }
