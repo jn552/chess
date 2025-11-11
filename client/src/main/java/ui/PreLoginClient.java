@@ -1,17 +1,19 @@
 package ui;
 
-import com.sun.nio.sctp.NotificationHandler;
+
+
+import model.LoginData;
 
 import java.net.http.WebSocket;
 import java.util.Arrays;
 
 public class PreLoginClient {
     public final String serverUrl;
-    private final NotificationHandler notificationHandler;
+    private final ServerFacade server;
 
-    public PreLoginClient(String serverUrl, NotificationHandler notificationHandler) {
+    public PreLoginClient(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
+        this.server = new ServerFacade(serverUrl);
     }
 
     public String eval(String input) {
@@ -32,17 +34,31 @@ public class PreLoginClient {
         }
     }
 
+    public String register(String...params) throws ResponseException {
+        return "";
+    }
+
     public String login(String... params) throws ResponseException {
-        if (params.length >= 1) {
-            state = State.SIGNEDIN;
-            username = String.join(" ", params);
-            ws = new WebSocketFacade(serverUrl, notificationHandler);
-            return String.format("Loggin in as %s. ", username);
+        //checking to make sure a username and password only were sent in
+        if (params.length == 2) {
+            String username = params[0];
+            String password = params[1];
+
+            server.login(new LoginData(username, password));
+            return String.format("Logging in as %s. ", username);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
     }
 
+    public String help() {
+        return """
+                register <username> <password> <email> - to register an account
+                login <username> <password> to login to an account and play
+                quit - exit program
+                help - get list of commands
+               """;
+    }
 
 }

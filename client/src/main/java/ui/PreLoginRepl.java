@@ -1,18 +1,16 @@
 package ui;
 
 import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.Notification;
-import com.sun.nio.sctp.NotificationHandler;
 
 import java.util.Scanner;
 
 import static java.awt.Color.BLUE;
 
-public class PreLoginRepl implements NotificationHandler {
+public class PreLoginRepl {
     private final PreLoginClient client;
 
     public PreLoginRepl(String serverUrl) {
-        client = new PreLoginClient(serverUrl, this);
+        client = new PreLoginClient(serverUrl);
     }
     public void run() {
 
@@ -41,11 +39,6 @@ public class PreLoginRepl implements NotificationHandler {
     }
 
     private void printPrompt(){
-        System.out.println("PRINT PROMPT HERE");
-    }
-    @Override
-    public HandlerResult handleNotification(Notification notification, Object attachment) {
-        // INTELLIJ SAID TO DO THIS< NOT SURE WHAT TO DO WITH THIS YET
-        return null;
+        System.out.println("Welcome to CS 240 Chess. Type 'help' to get started.");
     }
 }
