@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class PreLoginClient {
     public final String serverUrl;
     private final ServerFacade server;
-    private AuthData userAuthData;
+    private AuthData userAuthData = null;
 
     public PreLoginClient(String serverUrl) {
         this.serverUrl = serverUrl;

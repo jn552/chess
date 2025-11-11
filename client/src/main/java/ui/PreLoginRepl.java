@@ -1,7 +1,5 @@
 package ui;
 
-import com.sun.nio.sctp.HandlerResult;
-
 import java.util.Scanner;
 
 import static java.awt.Color.BLUE;
@@ -12,6 +10,7 @@ public class PreLoginRepl {
     public PreLoginRepl(String serverUrl) {
         client = new PreLoginClient(serverUrl);
     }
+
     public void run() {
 
         // opening messages
