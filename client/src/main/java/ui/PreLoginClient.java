@@ -3,6 +3,7 @@ package ui;
 
 
 import model.LoginData;
+import model.UserData;
 
 import java.net.http.WebSocket;
 import java.util.Arrays;
@@ -22,7 +23,6 @@ public class PreLoginClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "help" -> help();
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "quit" -> "quit";
@@ -35,7 +35,18 @@ public class PreLoginClient {
     }
 
     public String register(String...params) throws ResponseException {
-        return "";
+        //checking to make sure a username, password, and email only were sent in
+        if (params.length == 3) {
+            String username = params[0];
+            String password = params[1];
+            String email = params[2];
+
+            server.register(new UserData(username, password, email));
+            return String.format("Registered %s with email %s. ", username, email);
+        }
+
+        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
+        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password> <email>");
     }
 
     public String login(String... params) throws ResponseException {
@@ -51,6 +62,7 @@ public class PreLoginClient {
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
     }
+
 
     public String help() {
         return """

@@ -23,8 +23,10 @@ public class ServerFacade {
         return handleResponse(response, UserData.class);
     }
 
-    public AuthData login(LoginData loginData) {
-        //example usesed EndpointResult as a standin i think
+    public AuthData login(LoginData loginData) throws ResponseException{
+        var request = buildRequest("POST", "session", loginData);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout(String authToken) {
