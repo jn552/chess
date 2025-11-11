@@ -17,10 +17,10 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData register(UserData user) throws ResponseException {
+    public AuthData register(UserData user) throws ResponseException {
         var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
-        return handleResponse(response, UserData.class);
+        return handleResponse(response, AuthData.class);
     }
 
     public AuthData login(LoginData loginData) throws ResponseException{

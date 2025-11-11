@@ -2,6 +2,7 @@ package ui;
 
 
 
+import model.AuthData;
 import model.LoginData;
 import model.UserData;
 
@@ -11,6 +12,7 @@ import java.util.Arrays;
 public class PreLoginClient {
     public final String serverUrl;
     private final ServerFacade server;
+    private AuthData userAuthData;
 
     public PreLoginClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -41,7 +43,7 @@ public class PreLoginClient {
             String password = params[1];
             String email = params[2];
 
-            server.register(new UserData(username, password, email));
+            userAuthData = server.register(new UserData(username, password, email));
             return String.format("Registered %s with email %s. ", username, email);
         }
 
@@ -55,7 +57,7 @@ public class PreLoginClient {
             String username = params[0];
             String password = params[1];
 
-            server.login(new LoginData(username, password));
+            userAuthData = server.login(new LoginData(username, password));
             return String.format("Logging in as %s. ", username);
         }
 
@@ -63,6 +65,9 @@ public class PreLoginClient {
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
     }
 
+    public AuthData getAuthData(){
+        return this.userAuthData;
+    }
 
     public String help() {
         return """
