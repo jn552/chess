@@ -18,38 +18,49 @@ public class ServerFacade {
     }
 
     public UserData register(UserData user) throws ResponseException {
-        var request = buildRequest("POST", "/user", user);
+        var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
         return handleResponse(response, UserData.class);
     }
 
     public AuthData login(LoginData loginData) throws ResponseException{
-        var request = buildRequest("POST", "session", loginData);
+        var request = buildRequest("POST", "/session", loginData, null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
-    public void logout(String authToken) {
-        //request here is auth tok
+
+    public void logout(String authToken) throws ResponseException{
+        var request = buildRequest("DELETE", "/session",null,  authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public Collection<GameData> listGames(String authToken) {
-        // request is auth token
+    public GameListData listGames(String authToken) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, GameListData.class) ;
     }
 
-    public String createGame(CreateGameData createGameData) {
-        //req is CreateGameDAta record class
+    public CreateGameResponse createGame(CreateGameData createGameData, String authToken) throws ResponseException {
+        var request = buildRequest("POST", "/game", createGameData, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResponse.class);
     }
 
-    public void joinGame(JoinRequestData joinRequestData) {
-
+    public void joinGame(JoinRequestData joinRequestData, String authToken) throws ResponseException {
+        var request = buildRequest("PUT", "/game",joinRequestData, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public void clear() {
-
+    public void clear() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
@@ -57,6 +68,11 @@ public class ServerFacade {
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
         }
+
+        if (authToken != null) {
+            request.setHeader("Authorization", authToken);
+        }
+
         return request.build();
     }
 
