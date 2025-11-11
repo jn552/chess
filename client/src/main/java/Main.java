@@ -11,7 +11,7 @@ public class Main {
         // i think the above code is just example filler
 
         //store server url
-        String serverUrl = "INSERT URL HERE";
+        String serverUrl = "http://localhost:8080";
 
         // while true
         while (true) {
