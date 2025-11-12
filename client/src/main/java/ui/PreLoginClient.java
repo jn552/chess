@@ -6,7 +6,6 @@ import model.AuthData;
 import model.LoginData;
 import model.UserData;
 
-import java.net.http.WebSocket;
 import java.util.Arrays;
 
 public class PreLoginClient {

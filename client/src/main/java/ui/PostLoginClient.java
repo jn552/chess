@@ -53,12 +53,12 @@ public class PostLoginClient {
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password> <email>");
+        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <gameName>");
     }
 
     public String list() throws ResponseException {
         GameListData gameList = server.listGames(getAuthData().authToken());
-        return String.format("Games: %s", gameList);
+        return printGameList(gameList);
     }
 
     public String join(String... params) throws ResponseException {
@@ -129,7 +129,7 @@ public class PostLoginClient {
     public String logout() throws ResponseException {
         server.logout(getAuthData().authToken());
         System.out.println("You have successfully logged out \n");
-        return "quit";
+        return "quit\n";
     }
 
 
@@ -161,5 +161,27 @@ public class PostLoginClient {
         return """
                how do i pritn the game
                """;
+    }
+
+    public String printGameList(GameListData gameList){
+        if (gameList.games().isEmpty()) {
+            return "There are currently no games. \n";
+        }
+
+        StringBuilder list = new StringBuilder();
+        list.append("Here are all the Games:\n");
+
+        // loping through each game and adding a newline to the string builder
+        for (GameData game: gameList.games()) {
+            int numID = game.gameID();
+            String name = game.gameName();
+            String whiteName = (game.whiteUsername() != null) ? game.whiteUsername() : "empty";
+            String blackName = (game.blackUsername() != null) ? game.blackUsername() : "empty";
+            list.append(String.format("GameID: %s, Game name: %s, White username: %s, Black username: %s\n", numID, name, whiteName, blackName));
+        }
+        // to make output more pretty lol
+        list.append("\n");
+
+        return list.toString();
     }
 }

@@ -4,7 +4,6 @@ import model.AuthData;
 
 import java.util.Scanner;
 
-import static java.awt.Color.BLUE;
 
 public class PreLoginRepl {
     private final PreLoginClient client;
@@ -16,7 +15,7 @@ public class PreLoginRepl {
     public AuthData run() {
 
         // opening messages
-        System.out.println("\uD83D\uDC36 Welcome to a CS240 Chess Server. Sign in to start.");
+        System.out.println("\nWelcome to a CS240 Chess Server. Sign in to start.");
         System.out.println(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -29,7 +28,7 @@ public class PreLoginRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(result);
             }
 
             catch (Throwable e) {
@@ -46,6 +45,6 @@ public class PreLoginRepl {
     }
 
     private void printPrompt(){
-        System.out.println("Welcome to CS 240 Chess. Type 'help' to get started.");
+        System.out.println("\nWelcome to CS 240 Chess. Type 'help' to get started.");
     }
 }

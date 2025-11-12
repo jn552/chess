@@ -45,7 +45,7 @@ public class RegisterHandler implements Handler {
         catch (DataAccessException error){
             context.status(500);
             context.result(gson.toJson(Map.of("message", error.getMessage(),
-                                              "status", "ClientError")));
+                                              "status", "ServerError")));
         }
 
     }

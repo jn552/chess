@@ -27,12 +27,12 @@ public class UserService {
 
         // check if any of UserData fields are null
         if (user.username() == null || user.password() == null || user.email() == null){
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (null field)");
         }
         // check if username is taken
 
         if (userDao.find(user.username()) != null) {
-            throw new TakenException("Error: already taken");
+            throw new TakenException("Error: username is already taken");
         }
 
 
@@ -52,11 +52,11 @@ public class UserService {
 
     public void isUser(String username) throws BadRequestException, DataAccessException {
         if (username == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (no username given)");
         }
 
         if (userDao.find(username) == null){
-            throw new NotAuthException("Error: unauthorized");
+            throw new NotAuthException("Error: unauthorized (username doesn't exist)");
         }
 
     }
@@ -69,7 +69,7 @@ public class UserService {
 
         // check if any of LoginData fields are null
         if (username == null || password == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (no username or password given)");
         }
 
         // get real password
@@ -79,7 +79,7 @@ public class UserService {
 
         // check if passwords match
         if (!BCrypt.checkpw(password, realPass)) {
-            throw new NotAuthException("Error: unauthorized");
+            throw new NotAuthException("Error: Failed to Login (incorrect username or password)");
         }
 
         // make new authData and save it

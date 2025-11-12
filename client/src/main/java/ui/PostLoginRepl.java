@@ -4,7 +4,6 @@ import model.AuthData;
 
 import java.util.Scanner;
 
-import static java.awt.Color.BLUE;
 
 public class PostLoginRepl {
     private final PostLoginClient client;
@@ -16,7 +15,7 @@ public class PostLoginRepl {
     public void run() {
 
         // opening messages
-        System.out.println("\uD83D\uDC36 Welcome, you are now logged in");
+        System.out.println("\nWelcome, you are now logged in");
         System.out.println(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -29,17 +28,16 @@ public class PostLoginRepl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(result);
             }
 
             catch (Throwable e) {
-                var msg = e.toString();
-                System.out.println(msg);
+                System.out.println(e.toString());
             }
         }
     }
 
     private void printPrompt(){
-        System.out.println("Welcome to CS 240 Chess. Type 'help' to get started.");
+        System.out.println("\nYou are logged in. Type 'help' to get started.");
     }
 }
