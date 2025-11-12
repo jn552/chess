@@ -182,6 +182,9 @@ public class PostLoginClient {
         // to make output more pretty lol
         list.append("\n");
 
+        this.gameList.clear();
+        this.gameList.addAll(gameList.games());
+
         return list.toString();
     }
 }

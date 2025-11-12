@@ -15,7 +15,7 @@ public class PostLoginRepl {
     public void run() {
 
         // opening messages
-        System.out.println("\nWelcome, you are now logged in");
+        System.out.println("\n Welcome, you are now logged in");
         System.out.println(client.help());
 
         Scanner scanner = new Scanner(System.in);
