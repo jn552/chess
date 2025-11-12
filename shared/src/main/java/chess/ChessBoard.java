@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class ChessBoard {
 
-    ChessPiece[][] squares = new ChessPiece[8][8];  //creates empty 8x8 board but index starts at 0, so 0-7
+    public ChessPiece[][] squares = new ChessPiece[8][8];  //creates empty 8x8 board but index starts at 0, so 0-7
 
     public ChessBoard() {
 
