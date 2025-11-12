@@ -36,7 +36,12 @@ public class PreLoginRepl {
                 var msg = e.toString();
                 System.out.println(msg);
             }
+
+            if (client.getAuthData() != null) {
+                break;
+            }
         }
+
         return client.getAuthData();
     }
 

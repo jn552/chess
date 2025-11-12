@@ -32,17 +32,20 @@ public class RegisterHandler implements Handler {
 
         catch (BadRequestException error) {
             context.status(400);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                                              "status", "ClientError")));
         }
 
         catch (TakenException error){
             context.status(403);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                                              "status", "ClientError")));
         }
 
         catch (DataAccessException error){
             context.status(500);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                                              "status", "ClientError")));
         }
 
     }

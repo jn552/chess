@@ -5,12 +5,17 @@ package ui;
 import chess.ChessGame;
 import model.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class PostLoginClient {
     public final String serverUrl;
     private final ServerFacade server;
-    private AuthData userAuthData;
+    private final AuthData userAuthData;
+
+    // for observe (just for now while no live updates)
+    private Collection<GameData> gameList = new ArrayList<>();
 
     public PostLoginClient(String serverUrl, AuthData authData) {
         this.serverUrl = serverUrl;
@@ -28,7 +33,7 @@ public class PostLoginClient {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
-                case "quit" -> "quit";
+                case "logout" -> logout();
                 default -> help();
             };
         }
@@ -43,6 +48,7 @@ public class PostLoginClient {
             String gameName = params[0];
 
             CreateGameResponse createGameResponse = server.createGame(new CreateGameData(gameName), getAuthData().authToken());
+            gameList.add(new GameData(createGameResponse.gameID(), null, null, null, new ChessGame()));
             return String.format("Created game with name %s and ID %s. ", gameName, createGameResponse.gameID());
         }
 
@@ -51,13 +57,11 @@ public class PostLoginClient {
     }
 
     public String list() throws ResponseException {
-
         GameListData gameList = server.listGames(getAuthData().authToken());
-        // MIGHT HAVE TO DESERIALIZE HERE
-        return String.format("Logging in as %s. ", gameList);
+        return String.format("Games: %s", gameList);
     }
 
-    public void join(String... params) throws ResponseException {
+    public String join(String... params) throws ResponseException {
         //checking to make sure a username and password only were sent in
         if (params.length == 2) {
             String gameID = params[0];
@@ -71,50 +75,63 @@ public class PostLoginClient {
             }
 
             // convert color to white or black type
+            ChessGame.TeamColor teamColor = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 
-            // checking if the user actually entered a sstring that can be converted to an integer
+            // checking if the user actually entered a string that can be converted to an integer
             try {
                 intGameID = Integer.parseInt(gameID);
             }
 
             catch (Exception e) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID> <WHITE|BLACK>");
+                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist. must be an integer");
             }
 
-            server.join(new JoinRequestData(color, intGameID), getAuthData().authToken());
+            // checking game existence
+            if (!gameExists(intGameID)) {
+                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist");
+            }
+
+            server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
+            return String.format("Joined game %s as team %s.", gameID, color);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
+        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID> <WHITE|BLACK>");
     }
 
     public String observe(String... params) throws ResponseException {
-        //checking to make sure a username and password only were sent in
-        if (params.length == 2) {
-            String username = params[0];
-            String password = params[1];
+        //checking only a gameID was passed in
+        if (params.length == 1) {
+            String gameID = params[0];
+            int intGameID = 0;
 
-            userAuthData = server.login(new LoginData(username, password));
-            return String.format("Logging in as %s. ", username);
+            // checking if ID is actually an integer
+            try {
+                intGameID = Integer.parseInt(gameID);
+            }
+
+            catch (Exception e) {
+                throw new ResponseException(ResponseException.Code.ClientError, "Expected as an integer: <ID>" );
+            }
+
+            // if game exists check
+            if (!gameExists(intGameID)) {
+                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
+            }
+
+            return printGame(intGameID);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
+        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID>");
     }
 
-    public String logout(String... params) throws ResponseException {
-        //checking to make sure a username and password only were sent in
-        if (params.length == 2) {
-            String username = params[0];
-            String password = params[1];
-
-            userAuthData = server.login(new LoginData(username, password));
-            return String.format("Logging in as %s. ", username);
-        }
-
-        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <username> <password>");
+    public String logout() throws ResponseException {
+        server.logout(getAuthData().authToken());
+        System.out.println("You have successfully logged out \n");
+        return "quit";
     }
+
 
     public AuthData getAuthData(){
         return this.userAuthData;
@@ -131,4 +148,18 @@ public class PostLoginClient {
                    """;
     }
 
+    private boolean gameExists(int ID) {
+        for (GameData game: gameList) {
+            if (game.gameID() == ID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String printGame(int gameID) {
+        return """
+               how do i pritn the game
+               """;
+    }
 }

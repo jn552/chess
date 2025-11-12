@@ -16,7 +16,7 @@ public class PostLoginRepl {
     public void run() {
 
         // opening messages
-        System.out.println("\uD83D\uDC36 Welcome" + client.getAuthData().username());
+        System.out.println("\uD83D\uDC36 Welcome, you are now logged in");
         System.out.println(client.help());
 
         Scanner scanner = new Scanner(System.in);
