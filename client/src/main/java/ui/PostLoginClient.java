@@ -95,7 +95,7 @@ public class PostLoginClient {
             }
 
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
-            return String.format("Joined game %s as team %s.", gameID, color);
+            return String.format("Joined game %s as team %s. \n" + printGame(intGameID, gameList, color), gameID, color);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
@@ -122,7 +122,7 @@ public class PostLoginClient {
                 throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
             }
 
-            return printGame(intGameID, gameList);
+            return printGame(intGameID, gameList, "black");
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
@@ -197,8 +197,8 @@ public class PostLoginClient {
         );
 
         Map<ChessGame.TeamColor, String> colorToString = Map.ofEntries(
-                Map.entry(ChessGame.TeamColor.BLACK, "30"),
-                Map.entry(ChessGame.TeamColor.WHITE, "20"));
+                Map.entry(ChessGame.TeamColor.WHITE, "30"),
+                Map.entry(ChessGame.TeamColor.BLACK, "20"));
 
         // getting chessgame's board
         ChessBoard board = null;
@@ -235,7 +235,7 @@ public class PostLoginClient {
         StringBuilder chessBoardString = new StringBuilder();
 
         // adding 1st row accordig to black or white perspective
-        if (perspective.equals("black")) {
+        if (perspective.equals("white")) {
             chessBoardString.append(vertEndRowsBlack);
         }
         else {
@@ -244,19 +244,23 @@ public class PostLoginClient {
 
         for (int i=0; i<8; i++) {
             // reverse i if building other perspective
-            i = (perspective.equals("black")) ? i : 8 - (i + 1);
+            int newI = (perspective.equals("white")) ? i : (7 - i);
+
             // building rows one by one
             StringBuilder rowString = new StringBuilder();
-            String rowEndSquare = String.format("\u001B[30;102;1m %s \u001B[0m", Integer.toString(8 - i));
+            String rowEndSquare = String.format("\u001B[30;102;1m %s \u001B[0m", Integer.toString(8 - newI));
 
             rowString.append(rowEndSquare);
             for (int j=0; j<8; j++) {
-                String backColor = ((i + j) % 2 == 0) ? "102" : "42";
-                if (board.squares[i][j] != null) {
+
+                // reverse j if building from other persepctive
+                int newJ = (perspective.equals("white")) ? j : 8 - (j + 1);
+                String backColor = ((newI + newJ) % 2 == 0) ? "102" : "42";
+                if (board.squares[newI][newJ] != null) {
                     rowString.append(String.format("\u001B[%s;%s;1m %s \u001B[0m",
-                            colorToString.get(board.squares[i][j].getTeamColor()),
+                            colorToString.get(board.squares[newI][newJ].getTeamColor()),
                             backColor,
-                            pieceToString.get(board.squares[i][j].getPieceType())));
+                            pieceToString.get(board.squares[newI][newJ].getPieceType())));
                 }
                 else {
                     rowString.append(String.format("\u001B[%s;%s;1m %s \u001B[0m",
@@ -269,9 +273,13 @@ public class PostLoginClient {
 
             chessBoardString.append(rowString);
         }
-        chessBoardString.append(vertEndRowsBlack);
 
-
+        if (perspective.equals("white")) {
+            chessBoardString.append(vertEndRowsBlack);
+        }
+        else {
+            chessBoardString.append(vertEndRowsWhite);
+        }
 
         return chessBoardString.toString();
 
