@@ -41,7 +41,7 @@ public class GameService {
 
         // checking nullity (if authToken is null it means not authorized)
         if (createGameData.gameName() == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (no game name given");
         }
 
         // checking authToken
@@ -61,12 +61,12 @@ public class GameService {
     private void ableToJoin(ChessGame.TeamColor teamColor, GameData gameData) {
         if (teamColor == ChessGame.TeamColor.BLACK) {
             if (gameData.blackUsername() != null){
-                throw new TakenException("Error: already taken");
+                throw new TakenException("Error: Team Color is already taken");
             }
         }
         else{
             if (gameData.whiteUsername() != null) {
-                throw new TakenException("Error: already taken");
+                throw new TakenException("Error: Team Color is already taken");
             }
         }
     }
@@ -78,7 +78,7 @@ public class GameService {
 
         // null field check
         if (teamColor == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (no team color given)");
         }
 
         // validate Auth
@@ -86,7 +86,7 @@ public class GameService {
 
         // check to see if gameID exists
         if (gameDao.find(gameID) == null) {
-            throw new BadRequestException("Error: bad request");
+            throw new BadRequestException("Error: bad request (gameID does not exist)");
         }
         GameData gameData = gameDao.find(gameID);
 

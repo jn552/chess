@@ -30,17 +30,20 @@ public class CreateGameHandler implements Handler {
 
         catch (BadRequestException error) {
             context.status(400);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ClientError")));
         }
 
         catch (NotAuthException error){
             context.status(401);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ClientError")));
         }
 
         catch (DataAccessException error){
             context.status(500);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ServerError")));
 
         }
 

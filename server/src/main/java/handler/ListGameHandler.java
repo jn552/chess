@@ -34,12 +34,14 @@ public class ListGameHandler implements Handler {
 
         catch (NotAuthException error){
             context.status(401);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ClientError")));
         }
 
         catch (DataAccessException error){
             context.status(500);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ServerError")));
         }
 
 

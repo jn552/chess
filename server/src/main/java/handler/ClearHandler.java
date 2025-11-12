@@ -24,7 +24,8 @@ public class ClearHandler implements Handler {
 
         catch (DataAccessException error) {
             context.status(500);
-            context.result(gson.toJson(Map.of("message", error.getMessage())));
+            context.result(gson.toJson(Map.of("message", error.getMessage(),
+                    "status", "ServerError")));
         }
     }
 
