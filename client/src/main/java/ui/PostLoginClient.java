@@ -150,9 +150,9 @@ public class PostLoginClient {
                    """;
     }
 
-    private boolean gameExists(int ID) {
+    private boolean gameExists(int id) {
         for (GameData game: gameList) {
-            if (game.gameID() == ID) {
+            if (game.gameID() == id) {
                 return true;
             }
         }
