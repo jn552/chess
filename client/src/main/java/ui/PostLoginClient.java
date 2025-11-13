@@ -131,8 +131,7 @@ public class PostLoginClient {
 
     public String logout() throws ResponseException {
         server.logout(getAuthData().authToken());
-        System.out.println("You have successfully logged out \n");
-        return "quit\n";
+        return "You have successfully logged out \n";
     }
 
 

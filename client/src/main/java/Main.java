@@ -35,7 +35,5 @@ public class Main {
         // if authData is not null, then start make postlogin repl and call its run
         // NOTE: post login repl should start the game repl loop when someone does "join"
 
-        // outside while, print exit meessage
-        System.out.println("BYE");
     }
 }

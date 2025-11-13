@@ -56,7 +56,7 @@ public class UserService {
         }
 
         if (userDao.find(username) == null){
-            throw new NotAuthException("Error: unauthorized (username doesn't exist)");
+            throw new NotAuthException("Error: Username or password is incorrect)");
         }
 
     }

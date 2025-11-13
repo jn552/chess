@@ -22,7 +22,7 @@ public class PostLoginRepl {
         var result = "";
 
         // main loop
-        while (!result.equals("quit")) {
+        while (!result.equals("You have successfully logged out \n")) {
             printPrompt();
             String line = scanner.nextLine();
 
