@@ -7,10 +7,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import model.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public class PostLoginClient {
     public final String serverUrl;
@@ -18,7 +15,7 @@ public class PostLoginClient {
     private final AuthData userAuthData;
 
     // for observe (just for now while no live updates)
-    private Collection<GameData> gameList = new ArrayList<>();
+    private List<GameData> gameList = new ArrayList<>();
 
     public PostLoginClient(String serverUrl, AuthData authData) {
         this.serverUrl = serverUrl;
@@ -83,6 +80,7 @@ public class PostLoginClient {
             // checking if the user actually entered a string that can be converted to an integer
             try {
                 intGameID = Integer.parseInt(gameID);
+                int actGameID = gameList.get(intGameID- 1).gameID();
             }
 
             catch (Exception e) {
@@ -168,12 +166,13 @@ public class PostLoginClient {
         list.append("Here are all the Games:\n");
 
         // loping through each game and adding a newline to the string builder
+        int counter = 1;
         for (GameData game: gameList.games()) {
-            int numID = game.gameID();
             String name = game.gameName();
             String whiteName = (game.whiteUsername() != null) ? game.whiteUsername() : "empty";
             String blackName = (game.blackUsername() != null) ? game.blackUsername() : "empty";
-            list.append(String.format("GameID: %s, Game name: %s, White username: %s, Black username: %s\n", numID, name, whiteName, blackName));
+            list.append(String.format("Game#: %s, Game name: %s, White username: %s, Black username: %s\n", counter, name, whiteName, blackName));
+            counter += 1;
         }
         // to make output more pretty lol
         list.append("\n");
