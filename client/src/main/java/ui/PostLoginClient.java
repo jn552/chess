@@ -62,6 +62,9 @@ public class PostLoginClient {
     }
 
     public String join(String... params) throws ResponseException {
+        // update game list HERE also update it in create. gameList = server.listGames(getAuthData().authToken()) this
+        // code return a GameListData, but I need it to just be a list
+
         //checking to make sure a username and password only were sent in
         if (params.length == 2) {
             String gameID = params[0];

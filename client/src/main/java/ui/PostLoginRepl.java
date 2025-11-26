@@ -28,6 +28,8 @@ public class PostLoginRepl {
 
             try {
                 result = client.eval(line);
+
+                // if result is Certain thing enter GAME REPL HERE
                 System.out.print(result);
             }
 
