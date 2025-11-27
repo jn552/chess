@@ -28,9 +28,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx) {
         try {
             UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-            switch (action.type()) {
-                case ENTER -> enter(action.visitorName(), ctx.session);
-                case EXIT -> exit(action.visitorName(), ctx.session);
+            switch (action.getCommandType()) {
+                case CONNECT -> enter(action.visitorName(), ctx.session);
+                case MAKE_MOVE-> exit(action.visitorName(), ctx.session);
+                case LEAVE-> exit(action.visitorName(), ctx.session);
+                case RESIGN-> exit(action.visitorName(), ctx.session);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -40,5 +42,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(WsCloseContext ctx) {
         System.out.println("Websocket closed");
+    }
+
+    private void enter(String username, Session session, Integer gameID) throws IOException {
+        connectHandler.add(session, gameID);
+        var message = String.format("%s just entered the game", username);
+        var notification = new NotificationMessage(message, username, gameID);
+        connectHandler.broadcast(gameID, notification);
+    }
+
+    private void exit(String username, Session session, Integer gameID) throws IOException {
+        var message = String.format("%s left the game", username);
+        var notification = new NotificationMessage(message, username, gameID);
+        connectHandler.broadcast(gameID, notification);
+        connectHandler.remove(session);
     }
 }
