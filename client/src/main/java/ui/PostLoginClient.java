@@ -5,6 +5,7 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import exception.ResponseException;
 import model.*;
 
 import java.util.*;

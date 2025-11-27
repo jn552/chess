@@ -1,4 +1,4 @@
-package ui;
+package exception;
 
 import com.google.gson.Gson;
 

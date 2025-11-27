@@ -2,6 +2,7 @@ package ui;
 
 
 
+import exception.ResponseException;
 import model.AuthData;
 import model.LoginData;
 import model.UserData;
