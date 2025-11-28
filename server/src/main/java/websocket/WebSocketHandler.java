@@ -49,7 +49,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case CONNECT -> enter(username, ctx.session, action.getGameID());
                 case MAKE_MOVE-> makeMove(username, ctx.session, action.getGameID(), action.getChessMove());
                 case LEAVE-> exit(username, ctx.session, action.getGameID());
-                case RESIGN-> exit(action.visitorName(), ctx.session);
+                case RESIGN-> resign(username, ctx.session, action.getGameID());
             }
         }
 
@@ -89,12 +89,39 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(String username, Session session, Integer gameID, ChessMove chessMove) {
         try {
-
             // finidng game and then makign the move; if succeed broadcast to everyone move is made
             ChessGame chessGame = gameDao.find(gameID).game();
             chessGame.makeMove(chessMove);
+            //  update gamedao entry
 
-            //
+            // broadcast to everyone move was made
+            var message = String.format("%s moved a piece", username);
+            var notification = new NotificationMessage(message, username, gameID);
+            connectHandler.broadcast(gameID, notification);
+
+            // special state notifications (ie in check stalemate)
+            if (chessGame.isInCheck(chessGame.getTeamTurn())) {
+                var stateMessage = new NotificationMessage("INSERT PLAYER is in Check", username, gameID);
+                connectHandler.broadcast(gameID, stateMessage);
+            }
+
+            else if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
+                var stateMessage = new NotificationMessage("INSERT PLAYER is in Checkmate", username, gameID);
+                connectHandler.broadcast(gameID, stateMessage);
+            }
+
+            else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
+                var stateMessage = new NotificationMessage("Stalemate has occurred", username, gameID);
+                connectHandler.broadcast(gameID, stateMessage);
+            }
+
+            // board game update mesage
+            var boardMessage = new LoadGameMessage(gameID, chessGame);
+            connectHandler.broadcast(gameID, boardMessage);
+        }
+
+        catch (IOException ex) {
+            ex.printStackTrace();
         }
 
         catch (DataAccessException e) {
@@ -113,11 +140,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 var errorMessage = new ErrorMessage("Invalid move");
                 session.getRemote().sendString(errorMessage.toString());
             }
-
             catch (IOException error) {
                 error.printStackTrace();
             }
         }
+    }
 
+    public void resign(String username, Session session, Integer gameID) {
+        var message = String.format("%s left the game", username);
+        var notification = new NotificationMessage(message, username, gameID);
+        connectHandler.broadcast(gameID, notification);
+        connectHandler.remove(session);
     }
 }

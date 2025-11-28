@@ -8,9 +8,8 @@ public class LoadGameMessage extends ServerMessage {
     public ChessGame chessGame;
     // may need to add more but work with this for now
 
-    public LoadGameMessage(String message, int gameID, ChessGame chessGame) {
+    public LoadGameMessage(int gameID, ChessGame chessGame) {
         super(ServerMessageType.LOAD_GAME);
-        this.message = message;
         this.gameID = gameID;
         this.chessGame = chessGame;
     }
