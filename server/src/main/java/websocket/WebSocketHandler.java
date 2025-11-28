@@ -16,6 +16,7 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.AuthData;
 import model.GameData;
+import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import websocket.commands.*;
@@ -90,9 +91,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void makeMove(String username, Session session, Integer gameID, ChessMove chessMove) {
         try {
             // finidng game and then makign the move; if succeed broadcast to everyone move is made
-            ChessGame chessGame = gameDao.find(gameID).game();
+            GameData gameData = gameDao.find(gameID);
+            ChessGame chessGame = gameData.game();
             chessGame.makeMove(chessMove);
-            //  update gamedao entry
+
+            //  update gamedao entry clear old one then sanve new one with same ID
+            GameData newGameData = new GameData(gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    chessGame);
+            gameDao.remove(gameData);
+            gameDao.save(newGameData);
 
             // broadcast to everyone move was made
             var message = String.format("%s moved a piece", username);
@@ -146,10 +156,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    public void resign(String username, Session session, Integer gameID) {
-        var message = String.format("%s left the game", username);
+    public void resign(String username, Session session, Integer gameID) throws IOException {
+        var message = String.format("%s resigned", username);
         var notification = new NotificationMessage(message, username, gameID);
         connectHandler.broadcast(gameID, notification);
-        connectHandler.remove(session);
+        // NEED TO ADD ATTRIBUTE TO CHESSGAME, like GAMEOVER defaulting to false, then can'
+        // make move or resign if game is already over
+        // do something similar to lines  130 to 131 to send error message
     }
 }
