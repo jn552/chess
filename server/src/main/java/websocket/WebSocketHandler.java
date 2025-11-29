@@ -46,7 +46,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx) throws IOException {
         try {
             UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-            String username = authDao.find(action.getAuthToken()).username();
+
+            AuthData authData = authDao.find(action.getAuthToken());
+
+            // if authtoken is bad ie authData is null
+            if (authData == null) {
+                var errorMessage = new ErrorMessage("Invalid authToken");
+                ctx.session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+
+            String username = authData.username();
+
             switch (action.getCommandType()) {
                 case CONNECT -> enter(username, ctx.session, action.getGameID());
                 case MAKE_MOVE-> makeMove(username, ctx.session, action.getGameID(), action.getChessMove());
@@ -62,7 +73,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         catch (DataAccessException e) {
             try {
                 var errorMessage = new ErrorMessage(e.getMessage());
-                ctx.session.getRemote().sendString(errorMessage.toString());
+                ctx.session.getRemote().sendString(gson.toJson(errorMessage));
             }
             catch (IOException ex) {
                 ex.printStackTrace();
