@@ -133,6 +133,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             // finidng game and then makign the move; if succeed broadcast to everyone move is made
             GameData gameData = gameDao.find(gameID);
             ChessGame chessGame = gameData.game();
+
+            // checking to see if its session's turn
+            String turnName = (chessGame.getTeamTurn() == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
+            if (!turnName.equals(username)) {
+                var errorMessage = new ErrorMessage("Not your turn");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+
             chessGame.makeMove(chessMove);
 
             //  update gamedao entry clear old one then sanve new one with same ID
@@ -147,7 +156,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             // broadcast to everyone move was made
             var message = String.format("%s moved a piece", username);
             var notification = new NotificationMessage(message, username, gameID);
-            connectHandler.broadcast(gameID, notification, null);
+            connectHandler.broadcast(gameID, notification, session);
 
             // special state notifications (ie in check stalemate)
             if (chessGame.isInCheck(chessGame.getTeamTurn())) {
@@ -177,7 +186,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         catch (DataAccessException e) {
             try {
                 var errorMessage = new ErrorMessage(e.getMessage());
-                session.getRemote().sendString(errorMessage.toString());
+                session.getRemote().sendString(gson.toJson(errorMessage));
             }
             catch (IOException ex) {
                 ex.printStackTrace();
@@ -188,7 +197,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         catch (InvalidMoveException e) {
             try {
                 var errorMessage = new ErrorMessage("Invalid move");
-                session.getRemote().sendString(errorMessage.toString());
+                session.getRemote().sendString(gson.toJson(errorMessage));
             }
             catch (IOException error) {
                 error.printStackTrace();
