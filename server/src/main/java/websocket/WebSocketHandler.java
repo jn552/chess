@@ -29,6 +29,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final ConnectionManager connectHandler = new ConnectionManager();
     private final AuthDAOInterface authDao;
     private final GameDAOInterface gameDao;
+    private final Gson gson = new Gson();
 
     public WebSocketHandler(AuthDAOInterface authDao, GameDAOInterface gameDao) {
         this.authDao = authDao;
@@ -76,15 +77,43 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void enter(String username, Session session, Integer gameID) throws IOException {
         connectHandler.add(session, gameID);
-        var message = String.format("%s just entered the game", username);
-        var notification = new NotificationMessage(message, username, gameID);
-        connectHandler.broadcast(gameID, notification);
+        try {
+            GameData gameData = gameDao.find(gameID);
+
+            // if bad gameID
+            if (gameData == null) {
+                var errorMessage = new ErrorMessage("Invalid gameID");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+
+            ChessGame chessGame = gameData.game();
+
+            // sending load game message to the player who joined
+            var loadGameMessage = new LoadGameMessage(gameID, chessGame);
+            session.getRemote().sendString(gson.toJson(loadGameMessage));
+
+            // notifying everyone else that the player joined
+            var message = String.format("%s just entered the game", username);
+            var notification = new NotificationMessage(message, username, gameID);
+            connectHandler.broadcast(gameID, notification, session);
+        }
+
+        catch (DataAccessException e) {
+            try {
+                var errorMessage = new ErrorMessage(e.getMessage());
+                session.getRemote().sendString(gson.toJson(errorMessage));
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void exit(String username, Session session, Integer gameID) throws IOException {
         var message = String.format("%s left the game", username);
         var notification = new NotificationMessage(message, username, gameID);
-        connectHandler.broadcast(gameID, notification);
+        connectHandler.broadcast(gameID, notification, null);
         connectHandler.remove(session);
     }
 
@@ -107,27 +136,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             // broadcast to everyone move was made
             var message = String.format("%s moved a piece", username);
             var notification = new NotificationMessage(message, username, gameID);
-            connectHandler.broadcast(gameID, notification);
+            connectHandler.broadcast(gameID, notification, null);
 
             // special state notifications (ie in check stalemate)
             if (chessGame.isInCheck(chessGame.getTeamTurn())) {
                 var stateMessage = new NotificationMessage("INSERT PLAYER is in Check", username, gameID);
-                connectHandler.broadcast(gameID, stateMessage);
+                connectHandler.broadcast(gameID, stateMessage, null);
             }
 
             else if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
                 var stateMessage = new NotificationMessage("INSERT PLAYER is in Checkmate", username, gameID);
-                connectHandler.broadcast(gameID, stateMessage);
+                connectHandler.broadcast(gameID, stateMessage, null);
             }
 
             else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
                 var stateMessage = new NotificationMessage("Stalemate has occurred", username, gameID);
-                connectHandler.broadcast(gameID, stateMessage);
+                connectHandler.broadcast(gameID, stateMessage, null);
             }
 
             // board game update mesage
             var boardMessage = new LoadGameMessage(gameID, chessGame);
-            connectHandler.broadcast(gameID, boardMessage);
+            connectHandler.broadcast(gameID, boardMessage, null);
         }
 
         catch (IOException ex) {
@@ -159,7 +188,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void resign(String username, Session session, Integer gameID) throws IOException {
         var message = String.format("%s resigned", username);
         var notification = new NotificationMessage(message, username, gameID);
-        connectHandler.broadcast(gameID, notification);
+        connectHandler.broadcast(gameID, notification, null);
         // NEED TO ADD ATTRIBUTE TO CHESSGAME, like GAMEOVER defaulting to false, then can'
         // make move or resign if game is already over
         // do something similar to lines  130 to 131 to send error message

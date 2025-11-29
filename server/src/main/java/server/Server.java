@@ -6,6 +6,7 @@ import io.javalin.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
+import websocket.WebSocketHandler;
 
 public class Server {
 
@@ -43,8 +44,10 @@ public class Server {
         ListGameHandler listGameHandler = new ListGameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+        WebSocketHandler webSocketHandler = new WebSocketHandler(authDao, gameDao);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
+
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", registerHandler);
@@ -54,7 +57,11 @@ public class Server {
         javalin.get("/game", listGameHandler);
         javalin.post("/game", createGameHandler);
         javalin.put("/game", joinGameHandler);
-
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
     }
 
     public int run(int desiredPort) {

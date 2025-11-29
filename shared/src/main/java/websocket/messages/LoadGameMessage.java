@@ -5,13 +5,13 @@ import chess.ChessGame;
 public class LoadGameMessage extends ServerMessage {
     public String message;
     public int gameID;
-    public ChessGame chessGame;
+    public ChessGame game;
     // may need to add more but work with this for now
 
     public LoadGameMessage(int gameID, ChessGame chessGame) {
         super(ServerMessageType.LOAD_GAME);
         this.gameID = gameID;
-        this.chessGame = chessGame;
+        this.game = chessGame;
     }
 
     public String getMessage() {
@@ -19,6 +19,6 @@ public class LoadGameMessage extends ServerMessage {
     }
 
     public ChessGame getChessGame() {
-        return chessGame;
+        return game;
     }
 }
