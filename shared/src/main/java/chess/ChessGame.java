@@ -13,6 +13,7 @@ public class ChessGame {
 
     ChessBoard gameBoard;
     TeamColor teamTurn = TeamColor.WHITE;
+    public boolean gameOver = false;
 
     public ChessGame() {
         gameBoard = new ChessBoard();

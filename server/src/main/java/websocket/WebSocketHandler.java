@@ -124,8 +124,30 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void exit(String username, Session session, Integer gameID) throws IOException {
         var message = String.format("%s left the game", username);
         var notification = new NotificationMessage(message, username, gameID);
-        connectHandler.broadcast(gameID, notification, null);
+        connectHandler.broadcast(gameID, notification, session);
         connectHandler.remove(session);
+
+        // removing the session's user from the gameData
+        try {
+            GameData gameData = gameDao.find(gameID);
+            ChessGame.TeamColor playerColor = (username.equals(gameData.whiteUsername())) ? ChessGame.TeamColor.WHITE: ChessGame.TeamColor.BLACK;
+            GameData newGameData = (playerColor == ChessGame.TeamColor.WHITE) ? new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.blackUsername(), gameData.game()) :
+                    new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.blackUsername(), gameData.game());
+            gameDao.remove(gameData);
+            gameDao.save(newGameData);
+        }
+
+        catch (DataAccessException e) {
+            try {
+                var errorMessage = new ErrorMessage(e.getMessage());
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+                return;
+            }
+        }
     }
 
     private void makeMove(String username, Session session, Integer gameID, ChessMove chessMove) {
@@ -142,6 +164,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 return;
             }
 
+            if (chessGame.gameOver) {
+                var errorMessage = new ErrorMessage("Someone has resigned; the game is over ");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
             chessGame.makeMove(chessMove);
 
             //  update gamedao entry clear old one then sanve new one with same ID
@@ -206,11 +233,66 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     public void resign(String username, Session session, Integer gameID) throws IOException {
+
+        GameData gameData = null;
+        // checkign to see if you are NOT an observer
+        try {
+            gameData = gameDao.find(gameID);
+            if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+                var errorMessage = new ErrorMessage("Observers cannot resign; leave instead if you want to exit.");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+
+            // checking to see if game is already over
+            if (gameData.game().gameOver) {
+                var errorMessage = new ErrorMessage("Game is done; cannot resign again.");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+        }
+
+         catch (DataAccessException e) {
+            try {
+                var errorMessage = new ErrorMessage(e.getMessage());
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
+                return;
+            }
+        }
+
         var message = String.format("%s resigned", username);
         var notification = new NotificationMessage(message, username, gameID);
         connectHandler.broadcast(gameID, notification, null);
-        // NEED TO ADD ATTRIBUTE TO CHESSGAME, like GAMEOVER defaulting to false, then can'
-        // make move or resign if game is already over
-        // do something similar to lines  130 to 131 to send error message
+
+        //  update gamedao entry clear old one then sanve new one with same ID
+        ChessGame chessGame = gameData.game();
+        chessGame.gameOver = true;
+        GameData newGameData = new GameData(gameData.gameID(),
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                chessGame);
+
+        try {
+            gameDao.remove(gameData);
+            gameDao.save(newGameData);
+        }
+
+        catch (DataAccessException e) {
+            try {
+                var errorMessage = new ErrorMessage(e.getMessage());
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return;
+            }
+        }
+
+
     }
 }
