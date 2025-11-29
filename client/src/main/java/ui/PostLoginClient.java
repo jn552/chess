@@ -7,6 +7,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import exception.ResponseException;
 import model.*;
+import ui.helpers.BoardPrinter;
 
 import java.util.*;
 
@@ -97,7 +98,7 @@ public class PostLoginClient {
             }
 
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
-            return String.format("Joined game %s as team %s. \n" + printGame(intGameID, gameList, color), gameID, color);
+            return String.format("Joined game %s as team %s. \n" + BoardPrinter.printGame(null, intGameID, gameList, color), gameID, color);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
@@ -124,7 +125,7 @@ public class PostLoginClient {
                 throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
             }
 
-            return printGame(intGameID, gameList, "black");
+            return BoardPrinter.printGame(null, intGameID, gameList, "black");
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
@@ -185,105 +186,5 @@ public class PostLoginClient {
         this.gameList.addAll(gameList.games());
 
         return list.toString();
-    }
-
-    public String printGame(int gameID, Collection<GameData> gameList, String perspective){
-
-        Map<ChessPiece.PieceType, String> pieceToString = Map.ofEntries(
-                Map.entry(ChessPiece.PieceType.KING, "Ki"),
-                Map.entry(ChessPiece.PieceType.QUEEN, "Qu"),
-                Map.entry(ChessPiece.PieceType.ROOK, "Ro"),
-                Map.entry(ChessPiece.PieceType.BISHOP, "Bi"),
-                Map.entry(ChessPiece.PieceType.KNIGHT, "Kn"),
-                Map.entry(ChessPiece.PieceType.PAWN, "Pa")
-        );
-
-        Map<ChessGame.TeamColor, String> colorToString = Map.ofEntries(
-                Map.entry(ChessGame.TeamColor.WHITE, "30"),
-                Map.entry(ChessGame.TeamColor.BLACK, "20"));
-
-        // getting chessgame's board
-        ChessBoard board = null;
-        for (GameData gameData: gameList) {
-            if (gameData.gameID() == gameID) {
-                board = gameData.game().getBoard();
-            }
-        }
-
-        String vertEndRowsBlack = "\u001B[102;102;1m' '\u001B[0m" +
-                "\u001B[30;102;1m a  \u001B[0m" +
-                "\u001B[30;102;1m b  \u001B[0m" +
-                "\u001B[30;102;1m c  \u001B[0m" +
-                "\u001B[30;102;1m d  \u001B[0m" +
-                "\u001B[30;102;1m e  \u001B[0m" +
-                "\u001B[30;102;1m f  \u001B[0m" +
-                "\u001B[30;102;1m g  \u001B[0m" +
-                "\u001B[30;102;1m h  \u001B[0m" +
-                "\u001B[102;102;1m' '\u001B[0m" +
-                "\n";
-
-        String vertEndRowsWhite = "\u001B[102;102;1m' '\u001B[0m" +
-                "\u001B[30;102;1m h  \u001B[0m" +
-                "\u001B[30;102;1m g  \u001B[0m" +
-                "\u001B[30;102;1m f  \u001B[0m" +
-                "\u001B[30;102;1m e  \u001B[0m" +
-                "\u001B[30;102;1m d  \u001B[0m" +
-                "\u001B[30;102;1m c  \u001B[0m" +
-                "\u001B[30;102;1m b  \u001B[0m" +
-                "\u001B[30;102;1m a  \u001B[0m" +
-                "\u001B[102;102;1m' '\u001B[0m" +
-                "\n";
-
-        StringBuilder chessBoardString = new StringBuilder();
-
-        // adding 1st row accordig to black or white perspective
-        if (perspective.equals("white")) {
-            chessBoardString.append(vertEndRowsBlack);
-        }
-        else {
-            chessBoardString.append(vertEndRowsWhite);
-        }
-
-        for (int i=0; i<8; i++) {
-            // reverse i if building other perspective
-            int newI = (perspective.equals("white")) ? i : (7 - i);
-
-            // building rows one by one
-            StringBuilder rowString = new StringBuilder();
-            String rowEndSquare = String.format("\u001B[30;102;1m %s \u001B[0m", Integer.toString(8 - newI));
-
-            rowString.append(rowEndSquare);
-            for (int j=0; j<8; j++) {
-
-                // reverse j if building from other persepctive
-                int newJ = (perspective.equals("white")) ? j : 8 - (j + 1);
-                String backColor = ((newI + newJ) % 2 == 0) ? "102" : "42";
-                if (board.squares[newI][newJ] != null) {
-                    rowString.append(String.format("\u001B[%s;%s;1m %s \u001B[0m",
-                            colorToString.get(board.squares[newI][newJ].getTeamColor()),
-                            backColor,
-                            pieceToString.get(board.squares[newI][newJ].getPieceType())));
-                }
-                else {
-                    rowString.append(String.format("\u001B[%s;%s;1m %s \u001B[0m",
-                            backColor,
-                            backColor,
-                            "  "));
-                }
-            }
-            rowString.append(rowEndSquare).append("\n");
-
-            chessBoardString.append(rowString);
-        }
-
-        if (perspective.equals("white")) {
-            chessBoardString.append(vertEndRowsBlack);
-        }
-        else {
-            chessBoardString.append(vertEndRowsWhite);
-        }
-
-        return chessBoardString.toString();
-
     }
 }
