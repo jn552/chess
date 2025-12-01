@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import jakarta.websocket.*;
 import websocket.commands.ConnectAction;
+import websocket.commands.LeaveAction;
 import websocket.commands.MakeMoveAction;
+import websocket.commands.ResignAction;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -62,5 +64,24 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void resign(String authToken, Integer gameID) throws ResponseException {
+        try {
+            var action = new ResignAction(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        }
+        catch (IOException e) {
+            throw new ResponseException(ResponseException.Code.ServerError, e.getMessage());
+        }
+    }
+
+    public void leave(String authToken, Integer gameID) throws ResponseException {
+        try {
+            var action = new LeaveAction(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        }
+        catch (IOException e) {
+            throw new ResponseException(ResponseException.Code.ServerError, e.getMessage());
+        }
+    }
 
 }
