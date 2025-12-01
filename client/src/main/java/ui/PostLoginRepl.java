@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class PostLoginRepl {
     private final PostLoginClient client;
+    public boolean inGame = false;
 
     public PostLoginRepl(String serverUrl, AuthData authData) {
         client = new PostLoginClient(serverUrl, authData);
@@ -28,9 +29,13 @@ public class PostLoginRepl {
 
             try {
                 result = client.eval(line);
-
-                // if result is Certain thing enter GAME REPL HERE
                 System.out.print(result);
+
+
+                if (inGame) {
+                    int I = 0; //TODO do stuff here
+
+                }
             }
 
             catch (Throwable e) {
