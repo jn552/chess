@@ -7,10 +7,12 @@ import java.util.Scanner;
 public class GameRepl {
     private final GameClient client;
     private final Integer gameID;
+    private final String playerColor;
 
-    public GameRepl(String serverUrl, AuthData authData, Integer gameID) {
-        this.client = new GameClient(serverUrl, authData);
+    public GameRepl(String serverUrl, AuthData authData, Integer gameID, String playerColor) {
+        this.client = new GameClient(serverUrl, authData, gameID, playerColor);
         this.gameID = gameID;
+        this.playerColor = playerColor;
     }
 
     public void run() {

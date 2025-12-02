@@ -13,14 +13,15 @@ public class GameClient {
     public final String serverUrl;
     private final ServerFacade server;
     private final AuthData userAuthData;
+    private final Integer gameID;
+    private final String playerColor;
 
-    // for observe (just for now while no live updates)
-    private List<GameData> gameList = new ArrayList<>();
-
-    public GameClient(String serverUrl, AuthData authData) {
+    public GameClient(String serverUrl, AuthData authData, Integer gameID, String playerColor) {
         this.serverUrl = serverUrl;
         this.server = new ServerFacade(serverUrl);
         this.userAuthData = authData;
+        this.gameID = gameID;
+        this.playerColor = playerColor;
     }
 
     public String eval(String input) {
@@ -29,11 +30,11 @@ public class GameClient {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "redraw" -> create(params);
-                case "leave" -> list();
-                case "move" -> join(params);
-                case "resign" -> observe(params);
-                case "highlight" -> logout();
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "move" -> move(params);
+                case "resign" -> resign();
+                case "highlight" -> highlight();
                 default -> help();
             };
         }
@@ -42,68 +43,21 @@ public class GameClient {
         }
     }
 
-    public String create(String...params) throws ResponseException {
-        //checking to make sure a username, password, and email only were sent in
-        if (params.length == 1) {
-            String gameName = params[0];
+    public String redraw() throws ResponseException {
+        ChessBoard board = getUpdatedBoard();
 
-            CreateGameResponse createGameResponse = server.createGame(new CreateGameData(gameName), getAuthData().authToken());
-            gameList.add(new GameData(createGameResponse.gameID(), null, null, null, new ChessGame()));
-            return String.format("Created game with name %s and ID %s. ", gameName, createGameResponse.gameID());
-        }
-
-        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <gameName>");
+        System.out.print(BoardPrinter.printGame(board, gameID, null, playerColor));
+        return "board redrawn";
     }
 
-    public String list() throws ResponseException {
-        GameListData gameList = server.listGames(getAuthData().authToken());
-        return printGameList(gameList);
+
+    public String leave() throws ResponseException {
+        //TODO disconnnect the session
+        return "";
     }
 
-    public String join(String... params) throws ResponseException {
-        // update game list HERE also update it in create. gameList = server.listGames(getAuthData().authToken()) this
-        // code return a GameListData, but I need it to just be a list
-
-        //checking to make sure a username and password only were sent in
-        if (params.length == 2) {
-            String gameID = params[0];
-            String color = params[1].toLowerCase();
-            int intGameID = 0;
-
-
-            // checking if use ractualy entererd white or black
-            if (!color.equals("white") && !color.equals("black")) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID> <WHITE|BLACK>");
-            }
-
-            // convert color to white or black type
-            ChessGame.TeamColor teamColor = (color.equals("white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-
-            // checking if the user actually entered a string that can be converted to an integer
-            try {
-                intGameID = Integer.parseInt(gameID);
-                int actGameID = gameList.get(intGameID- 1).gameID();
-            }
-
-            catch (Exception e) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist. must be an integer");
-            }
-
-            // checking game existence
-            if (!gameExists(intGameID)) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist");
-            }
-
-            server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
-            return String.format("Joined game %s as team %s. \n" + BoardPrinter.printGame(null, intGameID, gameList, color), gameID, color);
-        }
-
-        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID> <WHITE|BLACK>");
-    }
-
-    public String observe(String... params) throws ResponseException {
+    public String move(String... params) throws ResponseException {
+        //TODO replace with move logic
         //checking only a gameID was passed in
         if (params.length == 1) {
             String gameID = params[0];
@@ -117,24 +71,21 @@ public class GameClient {
             catch (Exception e) {
                 throw new ResponseException(ResponseException.Code.ClientError, "Expected as an integer: <ID>" );
             }
-
-            // if game exists check
-            if (!gameExists(intGameID)) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
-            }
-
-            return BoardPrinter.printGame(null, intGameID, gameList, "black");
         }
+        return "";
 
-        // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID>");
     }
 
-    public String logout() throws ResponseException {
-        server.logout(getAuthData().authToken());
-        return "You have successfully logged out \n";
+    public String resign() throws ResponseException {
+        //TODO resign logic
+        //server.logout(getAuthData().authToken());
+        return "";
     }
 
+    public String highlight(String... params) throws ResponseException {
+        //TODO highlight logic
+        return "";
+    }
 
     public AuthData getAuthData(){
         return this.userAuthData;
@@ -151,38 +102,15 @@ public class GameClient {
                    """;
     }
 
-    private boolean gameExists(int id) {
-        for (GameData game: gameList) {
-            if (game.gameID() == id) {
-                return true;
+    private ChessBoard getUpdatedBoard() throws ResponseException {
+        // updating local game Storage of the game
+        Collection<GameData> gameList = server.listGames(getAuthData().authToken()).games();
+        for (GameData gameData: gameList) {
+            if (gameData.gameID() == gameID) {
+                return gameData.game().getBoard();
             }
         }
-        return false;
+        return null;
     }
 
-    public String printGameList(GameListData gameList){
-        if (gameList.games().isEmpty()) {
-            return "There are currently no games. \n";
-        }
-
-        StringBuilder list = new StringBuilder();
-        list.append("Here are all the Games:\n");
-
-        // loping through each game and adding a newline to the string builder
-        int counter = 1;
-        for (GameData game: gameList.games()) {
-            String name = game.gameName();
-            String whiteName = (game.whiteUsername() != null) ? game.whiteUsername() : "empty";
-            String blackName = (game.blackUsername() != null) ? game.blackUsername() : "empty";
-            list.append(String.format("Game#: %s, Game name: %s, White username: %s, Black username: %s\n", counter, name, whiteName, blackName));
-            counter += 1;
-        }
-        // to make output more pretty lol
-        list.append("\n");
-
-        this.gameList.clear();
-        this.gameList.addAll(gameList.games());
-
-        return list.toString();
-    }
 }

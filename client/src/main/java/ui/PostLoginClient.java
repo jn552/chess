@@ -25,7 +25,7 @@ public class PostLoginClient {
         this.userAuthData = authData;
     }
 
-    public String eval(String input) {
+    public EvalResponse eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -40,39 +40,41 @@ public class PostLoginClient {
             };
         }
         catch (ResponseException ex) {
-            return ex.getMessage();
+            return new EvalResponse(ex.getMessage(), null, null);
         }
     }
 
-    public String create(String...params) throws ResponseException {
+    public EvalResponse create(String...params) throws ResponseException {
         //checking to make sure a username, password, and email only were sent in
         if (params.length == 1) {
             String gameName = params[0];
 
             CreateGameResponse createGameResponse = server.createGame(new CreateGameData(gameName), getAuthData().authToken());
             gameList.add(new GameData(createGameResponse.gameID(), null, null, null, new ChessGame()));
-            return String.format("Created game with name %s and ID %s. ", gameName, createGameResponse.gameID());
+            System.out.println(String.format("Created game with name %s. ", gameName));
+            return new EvalResponse("", createGameResponse.gameID(), null);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <gameName>");
     }
 
-    public String list() throws ResponseException {
+    public EvalResponse list() throws ResponseException {
         GameListData gameList = server.listGames(getAuthData().authToken());
-        return printGameList(gameList);
+        System.out.println(printGameList(gameList));
+        return new EvalResponse("", null, null);
     }
 
-    public String join(String... params) throws ResponseException {
-        // update game list HERE also update it in create. gameList = server.listGames(getAuthData().authToken()) this
-        // code return a GameListData, but I need it to just be a list
+    public EvalResponse join(String... params) throws ResponseException {
+        // update game list field HERE also update it in create. gameList = server.listGames(getAuthData().authToken()) this; DONE
+        gameList = new ArrayList<>(server.listGames(getAuthData().authToken()).games());
 
         //checking to make sure a username and password only were sent in
         if (params.length == 2) {
             String gameID = params[0];
             String color = params[1].toLowerCase();
             int intGameID = 0;
-
+            int actGameID = -1;
 
             // checking if use ractualy entererd white or black
             if (!color.equals("white") && !color.equals("black")) {
@@ -85,7 +87,7 @@ public class PostLoginClient {
             // checking if the user actually entered a string that can be converted to an integer
             try {
                 intGameID = Integer.parseInt(gameID);
-                int actGameID = gameList.get(intGameID- 1).gameID();
+                actGameID = gameList.get(intGameID - 1).gameID();
             }
 
             catch (Exception e) {
@@ -99,19 +101,20 @@ public class PostLoginClient {
 
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
             System.out.println(BoardPrinter.printGame(null, intGameID, gameList, color));
-            return "joined game";
+            System.out.println("Joined Game");
+            return new EvalResponse("", actGameID, color);  //TODO mayber return the gameID in the string then parse it back to pass into the gamerepl
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID> <WHITE|BLACK>");
     }
 
-    public String observe(String... params) throws ResponseException {
+    public EvalResponse observe(String... params) throws ResponseException {
         //checking only a gameID was passed in
         if (params.length == 1) {
             String gameID = params[0];
             int intGameID = 0;
-
+            int actGameID = -1;
             // checking if ID is actually an integer
             try {
                 intGameID = Integer.parseInt(gameID);
@@ -121,22 +124,26 @@ public class PostLoginClient {
                 throw new ResponseException(ResponseException.Code.ClientError, "Expected as an integer: <ID>" );
             }
 
+            actGameID = gameList.get(intGameID - 1).gameID();
+
             // if game exists check
-            if (!gameExists(intGameID)) {
+            if (!gameExists(actGameID)) {
                 throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
             }
 
             System.out.println(BoardPrinter.printGame(null, intGameID, gameList, "black"));
-            return "observing game";
+            System.out.println("Observing Game");
+            return new EvalResponse("", actGameID, "black");
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
         throw new ResponseException(ResponseException.Code.ClientError, "Expected: <ID>");
     }
 
-    public String logout() throws ResponseException {
+    public EvalResponse logout() throws ResponseException {
         server.logout(getAuthData().authToken());
-        return "You have successfully logged out \n";
+        System.out.println("You have successfully logged out \n");
+        return new EvalResponse("You have successfully logged out \n", null, null);
     }
 
 
@@ -144,15 +151,16 @@ public class PostLoginClient {
         return this.userAuthData;
     }
 
-    public String help() {
-        return """
+    public EvalResponse help() {
+        System.out.println("""
                     logout - logs you out of the server
                     create <name> - create a game
                     list - get  list of current games
                     join <ID> <white|black> - join game with specified ID as specified color
                     observe <ID> - observe the game with specified ID
                     help - get list of commands
-                   """;
+                   """);
+        return new EvalResponse("", null, null);
     }
 
     private boolean gameExists(int id) {

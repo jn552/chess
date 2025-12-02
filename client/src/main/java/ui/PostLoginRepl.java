@@ -25,21 +25,23 @@ public class PostLoginRepl {
         System.out.println(client.help());
 
         Scanner scanner = new Scanner(System.in);
-        var result = "";
+        EvalResponse result = new EvalResponse("", null, null);
 
         // main loop
-        while (!result.equals("You have successfully logged out \n")) {
+        while (!result.message.equals("You have successfully logged out \n")) {
             printPrompt();
             String line = scanner.nextLine();
 
             try {
                 result = client.eval(line);
-                System.out.print(result);
-
+                System.out.print(result.message);
+                if (!(result.color==null) && !(result.gameID==null)) {
+                    inGame = true;
+                }
 
                 if (inGame) {
-                    Integer gameID = 0;   //TODO standin, find a way to get the gameID
-                    gameRepl = new GameRepl(serverUrl, authData, gameID);
+                    //TODO standin, find a way to get the gameID, i think i did this
+                    gameRepl = new GameRepl(serverUrl, authData, result.gameID, result.color);
                     gameRepl.run();
                     inGame = false;
                 }
