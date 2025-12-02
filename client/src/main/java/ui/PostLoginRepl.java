@@ -8,9 +8,14 @@ import java.util.Scanner;
 public class PostLoginRepl {
     private final PostLoginClient client;
     public boolean inGame = false;
+    public GameRepl gameRepl;
+    private String serverUrl;
+    private AuthData authData;
 
     public PostLoginRepl(String serverUrl, AuthData authData) {
         client = new PostLoginClient(serverUrl, authData);
+        this.serverUrl = serverUrl;
+        this.authData = authData;
     }
 
     public void run() {
@@ -33,8 +38,10 @@ public class PostLoginRepl {
 
 
                 if (inGame) {
-                    int I = 0; //TODO do stuff here
-
+                    Integer gameID = 0;   //TODO standin, find a way to get the gameID
+                    gameRepl = new GameRepl(serverUrl, authData, gameID);
+                    gameRepl.run();
+                    inGame = false;
                 }
             }
 

@@ -98,7 +98,8 @@ public class PostLoginClient {
             }
 
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
-            return String.format("Joined game %s as team %s. \n" + BoardPrinter.printGame(null, intGameID, gameList, color), gameID, color);
+            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, color));
+            return "joined game";
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
@@ -125,7 +126,8 @@ public class PostLoginClient {
                 throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
             }
 
-            return BoardPrinter.printGame(null, intGameID, gameList, "black");
+            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, "black"));
+            return "observing game";
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors
