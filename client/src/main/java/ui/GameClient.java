@@ -38,7 +38,7 @@ public class GameClient {
                 case "leave" -> leave();
                 case "move" -> move(params);
                 case "resign" -> resign();
-                case "highlight" -> highlight();
+                case "highlight" -> highlight(params);
                 default -> help();
             };
         }
@@ -50,7 +50,7 @@ public class GameClient {
     public String redraw() throws ResponseException {
         ChessBoard board = getUpdatedBoard();
 
-        System.out.print(BoardPrinter.printGame(board, gameID, null, playerColor));
+        System.out.print(BoardPrinter.printGame(board, gameID, null, playerColor, false, null, null));
         return "board redrawn";
     }
 
@@ -99,7 +99,7 @@ public class GameClient {
 
     public String highlight(String... params) throws ResponseException {
         //TODO highlight logic
-
+        ChessBoard board = getUpdatedBoard();
         String pos = "";
         int row = 9; // standins
         int col = 9;
@@ -111,13 +111,19 @@ public class GameClient {
             try {
                 row = Character.getNumericValue(parsePosString(pos).charAt(1));
                 col = parsePosString(pos).charAt(0) - 96;  // zero for col since its A5 not 5A
+                System.out.println(BoardPrinter.printGame(board, gameID, null, playerColor, true, row, col));
 
-
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
                 throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter (a-h) followed by a number (1-8) with no spaces");
             }
         }
-        throw new ResponseException(ResponseException.Code.ClientError, "Expected: highlight <pos> , where pos is letter (a-h) folowed by a number (1-8)");
+
+        else {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected: highlight <pos> , where pos is letter (a-h) folowed by a number (1-8)");
+        }
+        return "";
     }
 
 

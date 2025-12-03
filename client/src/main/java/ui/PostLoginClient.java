@@ -100,7 +100,7 @@ public class PostLoginClient {
             }
 
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
-            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, color));
+            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, color, false, null, null));
             System.out.println("Joined Game");
             return new EvalResponse("", actGameID, color);  //TODO mayber return the gameID in the string then parse it back to pass into the gamerepl
         }
@@ -134,7 +134,7 @@ public class PostLoginClient {
                 throw new ResponseException(ResponseException.Code.ClientError, "Game ID doesn't exist." );
             }
 
-            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, "black"));
+            System.out.println(BoardPrinter.printGame(null, intGameID, gameList, "black", false, null, null));
             System.out.println("Observing Game");
             return new EvalResponse("", actGameID, "black");
         }

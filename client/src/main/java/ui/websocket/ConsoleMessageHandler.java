@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import com.google.gson.Gson;
+import exception.ResponseException;
 import model.GameData;
 import ui.helpers.BoardPrinter;
 import websocket.messages.ErrorMessage;
@@ -24,13 +25,13 @@ public class ConsoleMessageHandler implements NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage notification) {
+    public void notify(ServerMessage notification) throws ResponseException {
         // loadgame message, prints the board
 
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) notification;
             ChessGame chessGame = loadGameMessage.getChessGame();
-            System.out.println(BoardPrinter.printGame(chessGame.getBoard(), loadGameMessage.gameID, null, playerColor));
+            System.out.println(BoardPrinter.printGame(chessGame.getBoard(), loadGameMessage.gameID, null, playerColor, false, null, null));
         }
 
         else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
