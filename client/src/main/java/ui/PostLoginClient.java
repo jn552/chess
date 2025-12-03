@@ -111,6 +111,8 @@ public class PostLoginClient {
 
     public EvalResponse observe(String... params) throws ResponseException {
         //checking only a gameID was passed in
+        gameList = new ArrayList<>(server.listGames(getAuthData().authToken()).games());
+
         if (params.length == 1) {
             String gameID = params[0];
             int intGameID = 0;
@@ -125,6 +127,7 @@ public class PostLoginClient {
             }
 
             actGameID = gameList.get(intGameID - 1).gameID();
+            System.out.println(actGameID);
 
             // if game exists check
             if (!gameExists(actGameID)) {

@@ -35,6 +35,7 @@ public class PostLoginRepl {
             try {
                 result = client.eval(line);
                 System.out.print(result.message);
+
                 if (!(result.color==null) && !(result.gameID==null)) {
                     inGame = true;
                 }

@@ -44,6 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext ctx) throws IOException {
+        System.out.println(ctx.message()); //leav eher
         try {
             UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
 
@@ -78,6 +79,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -181,20 +186,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             gameDao.save(newGameData);
 
             // broadcast to everyone move was made
-            var message = String.format("%s moved a piece", username);
+            var message = String.format("%s moved a piece from %s to %s", username, chessMove.getStartPosition(), chessMove.getEndPosition());
             var notification = new NotificationMessage(message, username, gameID);
             connectHandler.broadcast(gameID, notification, session);
 
+            String enemyName = (chessGame.getTeamTurn() == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
             // special state notifications (ie in check stalemate)
-            if (chessGame.isInCheck(chessGame.getTeamTurn())) {
-                var stateMessage = new NotificationMessage("INSERT PLAYER is in Check", username, gameID);
+
+            if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
+                var stateMessage = new NotificationMessage(String.format("%s is in Checkmate", enemyName), username, gameID);
                 connectHandler.broadcast(gameID, stateMessage, null);
             }
 
-            else if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
-                var stateMessage = new NotificationMessage("INSERT PLAYER is in Checkmate", username, gameID);
+            else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
+                var stateMessage = new NotificationMessage(String.format("%s is in Check", enemyName), username, gameID);
                 connectHandler.broadcast(gameID, stateMessage, null);
             }
+            // or maybe just say the color is in check
 
             else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
                 var stateMessage = new NotificationMessage("Stalemate has occurred", username, gameID);

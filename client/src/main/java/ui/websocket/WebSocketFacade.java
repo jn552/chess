@@ -8,6 +8,9 @@ import websocket.commands.ConnectAction;
 import websocket.commands.LeaveAction;
 import websocket.commands.MakeMoveAction;
 import websocket.commands.ResignAction;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -31,6 +34,17 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+
+                    if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        serverMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                    }
+                    else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                        serverMessage = new Gson().fromJson(message, NotificationMessage.class);
+                    }
+                    else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                        serverMessage = new Gson().fromJson(message, ErrorMessage.class);
+                    }
+
                     messageHandler.notify(serverMessage);
                 }
             });
