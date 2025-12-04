@@ -93,6 +93,19 @@ public class GameClient {
     }
 
     public String resign() throws ResponseException {
+        // add a confirmation check
+        Scanner scanner = new Scanner(System.in);
+        String line = "";
+        while (true) {
+            line = scanner.nextLine();
+            if (line.equals("N") || line.equals("n")) {
+                System.out.println("Did not resign; continue playing");
+                return "";
+            }
+            else if (line.equals("Y") || line.equals("y")) {
+                break;
+            }
+        }
         webSocketFacade.resign(userAuthData.authToken(), gameID);
         return "resigned";
     }
