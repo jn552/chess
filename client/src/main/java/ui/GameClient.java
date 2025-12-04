@@ -97,6 +97,7 @@ public class GameClient {
         Scanner scanner = new Scanner(System.in);
         String line = "";
         while (true) {
+            System.out.println("Are you sure? Enter Y/N");
             line = scanner.nextLine();
             if (line.equals("N") || line.equals("n")) {
                 System.out.println("Did not resign; continue playing");
