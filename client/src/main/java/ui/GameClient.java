@@ -18,7 +18,8 @@ public class GameClient {
     private WebSocketFacade webSocketFacade;
     private ConsoleMessageHandler consoleMessageHandler;
 
-    public GameClient(String serverUrl, AuthData authData, Integer gameID, String playerColor) throws ResponseException {
+    public GameClient(String serverUrl, AuthData authData, Integer gameID, String playerColor)
+            throws ResponseException {
         this.serverUrl = serverUrl;
         this.server = new ServerFacade(serverUrl);
         this.userAuthData = authData;
@@ -50,19 +51,20 @@ public class GameClient {
     public String redraw() throws ResponseException {
         ChessBoard board = getUpdatedBoard();
 
-        System.out.print(BoardPrinter.printGame(board, gameID, null, playerColor, false, null, null));
+        System.out.print(BoardPrinter.printGame(board, gameID, null,
+                playerColor, false, null, null));
         return "board redrawn";
     }
 
 
     public String leave() throws ResponseException {
-        //TODO disconnnect the session DONE?
+
         webSocketFacade.leave(userAuthData.authToken(), gameID);
         return "left game";
     }
 
     public String move(String... params) throws ResponseException {
-        //TODO replace with move logic
+
         //checking only a gameID was passed in
         String startPos = "";
         String endPos = "";
@@ -80,13 +82,16 @@ public class GameClient {
                 startRow = Character.getNumericValue(parsePosString(startPos).charAt(1));
                 startCol = parsePosString(startPos).charAt(0) - 96;  // zero for col since its A5 not 5A
                 endRow = Character.getNumericValue(parsePosString(endPos).charAt(1));
-                endCol = parsePosString(endPos).charAt(0) - 96;  // ascii for 'a' is 97, so I can just subtract 97 to get index
+                endCol = parsePosString(endPos).charAt(0) - 96;  // ascii for 'a' is 97, so I can just subtract 97
 
-                webSocketFacade.makeMove(userAuthData.authToken(), gameID, new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol), null));
+                webSocketFacade.makeMove(userAuthData.authToken(), gameID,
+                        new ChessMove(new ChessPosition(startRow, startCol),
+                                new ChessPosition(endRow, endCol), null));
             }
 
             catch (Exception e) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter (a-h) followed by a number (1-8) with no spaces");
+                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered " +
+                        "as a letter (a-h) followed by a number (1-8) with no spaces");
             }
         }
         return "";
@@ -112,7 +117,7 @@ public class GameClient {
     }
 
     public String highlight(String... params) throws ResponseException {
-        //TODO highlight logic
+
         ChessBoard board = getUpdatedBoard();
         String pos = "";
         int row = 9; // standins
@@ -125,17 +130,20 @@ public class GameClient {
             try {
                 row = Character.getNumericValue(parsePosString(pos).charAt(1));
                 col = parsePosString(pos).charAt(0) - 96;  // zero for col since its A5 not 5A
-                System.out.println(BoardPrinter.printGame(board, gameID, null, playerColor, true, row, col));
+                System.out.println(BoardPrinter.printGame(board, gameID, null,
+                        playerColor, true, row, col));
 
             }
             catch (Exception e) {
                 System.out.println(e.getMessage());
-                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter (a-h) followed by a number (1-8) with no spaces");
+                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a " +
+                        "letter (a-h) followed by a number (1-8) with no spaces");
             }
         }
 
         else {
-            throw new ResponseException(ResponseException.Code.ClientError, "Expected: highlight <pos> , where pos is letter (a-h) folowed by a number (1-8)");
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected: highlight <pos> , " +
+                    "where pos is letter (a-h) folowed by a number (1-8)");
         }
         return "";
     }
@@ -175,7 +183,8 @@ public class GameClient {
             // checking valid inputs
             if (!(row=='1' || row=='2' || row=='3' || row=='4' || row=='5' || row=='6' || row=='7' || row=='8') ||
                     !(col=='a'|| col=='b'|| col=='c'|| col=='d'|| col=='e'|| col=='f'|| col=='g'|| col=='h')) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter followed by a number with no spaces");
+                throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a " +
+                        "letter followed by a number with no spaces");
             }
 
             char[] parsedPos = {col, row};
@@ -183,7 +192,8 @@ public class GameClient {
         }
 
         catch (Exception e) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter followed by a number with no spaces");
+            throw new ResponseException(ResponseException.Code.ClientError, "Positions must be entered as a letter " +
+                    "followed by a number with no spaces");
         }
 
     }

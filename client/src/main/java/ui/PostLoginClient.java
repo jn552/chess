@@ -102,7 +102,7 @@ public class PostLoginClient {
             server.joinGame(new JoinRequestData(teamColor, intGameID), getAuthData().authToken());
             System.out.println(BoardPrinter.printGame(null, intGameID, gameList, color, false, null, null));
             System.out.println("Joined Game");
-            return new EvalResponse("", actGameID, color);  //TODO mayber return the gameID in the string then parse it back to pass into the gamerepl
+            return new EvalResponse("", actGameID, color);
         }
 
         // below, used to be 400 in place of ClientError, not sure but ResExcep maps 400 to ClientErrors

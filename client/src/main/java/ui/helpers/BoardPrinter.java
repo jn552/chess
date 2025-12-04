@@ -9,16 +9,15 @@ import java.util.Map;
 
 public class BoardPrinter {
 
-    public static String printGame(ChessBoard chessBoard, int gameID, Collection<GameData> gameList, String perspective, boolean highlight, Integer row, Integer col) throws ResponseException {
+    public static String printGame(ChessBoard chessBoard, int gameID, Collection<GameData> gameList,
+                                   String perspective, boolean highlight, Integer row, Integer col)
+            throws ResponseException {
         String highlightColor = "104";
 
         Map<ChessPiece.PieceType, String> pieceToString = Map.ofEntries(
-                Map.entry(ChessPiece.PieceType.KING, "Ki"),
-                Map.entry(ChessPiece.PieceType.QUEEN, "Qu"),
-                Map.entry(ChessPiece.PieceType.ROOK, "Ro"),
-                Map.entry(ChessPiece.PieceType.BISHOP, "Bi"),
-                Map.entry(ChessPiece.PieceType.KNIGHT, "Kn"),
-                Map.entry(ChessPiece.PieceType.PAWN, "Pa")
+                Map.entry(ChessPiece.PieceType.KING, "Ki"), Map.entry(ChessPiece.PieceType.QUEEN, "Qu"),
+                Map.entry(ChessPiece.PieceType.ROOK, "Ro"), Map.entry(ChessPiece.PieceType.BISHOP, "Bi"),
+                Map.entry(ChessPiece.PieceType.KNIGHT, "Kn"), Map.entry(ChessPiece.PieceType.PAWN, "Pa")
         );
 
         Map<ChessGame.TeamColor, String> colorToString = Map.ofEntries(
@@ -38,33 +37,21 @@ public class BoardPrinter {
             board = chessBoard;
         }
 
-        String vertEndRowsBlack = "\u001B[102;102;1m' '\u001B[0m" +
-                "\u001B[30;102;1m h  \u001B[0m" +
-                "\u001B[30;102;1m g  \u001B[0m" +
-                "\u001B[30;102;1m f  \u001B[0m" +
-                "\u001B[30;102;1m e  \u001B[0m" +
-                "\u001B[30;102;1m d  \u001B[0m" +
-                "\u001B[30;102;1m c  \u001B[0m" +
-                "\u001B[30;102;1m b  \u001B[0m" +
-                "\u001B[30;102;1m a  \u001B[0m" +
-                "\u001B[102;102;1m' '\u001B[0m" +
-                "\n";
+        String vertEndRowsBlack = "\u001B[102;102;1m' '\u001B[0m" + "\u001B[30;102;1m h  \u001B[0m" +
+                "\u001B[30;102;1m g  \u001B[0m" + "\u001B[30;102;1m f  \u001B[0m" + "\u001B[30;102;1m e  \u001B[0m" +
+                "\u001B[30;102;1m d  \u001B[0m" + "\u001B[30;102;1m c  \u001B[0m" +
+                "\u001B[30;102;1m b  \u001B[0m" + "\u001B[30;102;1m a  \u001B[0m" +
+                "\u001B[102;102;1m' '\u001B[0m" + "\n";
 
         String vertEndRowsWhite = "\u001B[102;102;1m' '\u001B[0m" +
-                "\u001B[30;102;1m a  \u001B[0m" +
-                "\u001B[30;102;1m b  \u001B[0m" +
-                "\u001B[30;102;1m c  \u001B[0m" +
-                "\u001B[30;102;1m d  \u001B[0m" +
-                "\u001B[30;102;1m e  \u001B[0m" +
-                "\u001B[30;102;1m f  \u001B[0m" +
-                "\u001B[30;102;1m g  \u001B[0m" +
-                "\u001B[30;102;1m h  \u001B[0m" +
-                "\u001B[102;102;1m' '\u001B[0m" +
-                "\n";
+                "\u001B[30;102;1m a  \u001B[0m" + "\u001B[30;102;1m b  \u001B[0m" +
+                "\u001B[30;102;1m c  \u001B[0m" + "\u001B[30;102;1m d  \u001B[0m" +
+                "\u001B[30;102;1m e  \u001B[0m" + "\u001B[30;102;1m f  \u001B[0m" +
+                "\u001B[30;102;1m g  \u001B[0m" + "\u001B[30;102;1m h  \u001B[0m" +
+                "\u001B[102;102;1m' '\u001B[0m" + "\n";
 
         StringBuilder chessBoardString = new StringBuilder();
 
-        // adding 1st row accordig to black or white perspective
         if (perspective.equals("black")) {
             chessBoardString.append(vertEndRowsBlack);
         }
@@ -121,7 +108,8 @@ public class BoardPrinter {
 
     }
 
-    private static boolean checkValidMoves(ChessBoard board, int row, int col, int newI, int newJ) throws ResponseException {
+    private static boolean checkValidMoves(ChessBoard board, int row, int col, int newI, int newJ)
+            throws ResponseException {
         ChessPiece piece;
 
         if (board.squares[row-1][col-1] == null) {

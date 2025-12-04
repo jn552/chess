@@ -76,13 +76,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 var errorMessage = new ErrorMessage(e.getMessage());
                 ctx.session.getRemote().sendString(gson.toJson(errorMessage));
             }
-            catch (IOException ex) {
-                ex.printStackTrace();
+            catch (IOException error) {
+                error.printStackTrace();
             }
-        }
-
-        catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -148,8 +144,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 session.getRemote().sendString(gson.toJson(errorMessage));
                 return;
             }
-            catch (IOException ex) {
-                ex.printStackTrace();
+            catch (IOException err) {
+                err.printStackTrace();
                 return;
             }
         }

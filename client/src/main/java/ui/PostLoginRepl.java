@@ -41,7 +41,6 @@ public class PostLoginRepl {
                 }
 
                 if (inGame) {
-                    //TODO standin, find a way to get the gameID, i think i did this
                     gameRepl = new GameRepl(serverUrl, authData, result.gameID, result.color);
                     gameRepl.run();
                     inGame = false;
